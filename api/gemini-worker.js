@@ -246,14 +246,83 @@ Escreva para uma empresa real local. Evite a palavra "joven" se não estiver cor
       return jsonResponse({ error: "A IA não retornou texto. Tente novamente." }, 502, origin);
     }
 
-    try {
-      const campaign = JSON.parse(text);
-      if (!campaign.hook || !campaign.script || !campaign.caption || !Array.isArray(campaign.scenes)) {
-        throw new Error("Resposta incompleta");
+    // Models may occasionally wrap JSON in Markdown fences or vary field names.
+    // Normalize those small differences instead of failing the whole request.
+    function parseJsonResponse(rawText) {
+      const variants = [
+        String(rawText || "").trim(),
+        String(rawText || "").trim()
+          .replace(/^\uFEFF/, "")
+          .replace(/^\s*```(?:json)?\s*/i, "")
+          .replace(/\s*```\s*$/, "")
+          .trim()
+      ];
+      for (const candidate of variants) {
+        try { return JSON.parse(candidate); } catch {}
+        const first = candidate.indexOf("{");
+        const last = candidate.lastIndexOf("}");
+        if (first >= 0 && last > first) {
+          try { return JSON.parse(candidate.slice(first, last + 1)); } catch {}
+        }
       }
-      return jsonResponse({ campaign }, 200, origin);
-    } catch {
-      return jsonResponse({ error: "A IA gerou uma resposta que não conseguimos ler. Tente novamente." }, 502, origin);
+      return null;
     }
+
+    const parsed = parseJsonResponse(text);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      return jsonResponse({
+        error: "A IA respondeu em um formato inesperado. Tente gerar novamente; se persistir, confira a configuração do modelo."
+      }, 502, origin);
+    }
+
+    const hook = cleanString(
+      parsed.hook || parsed.gancho || parsed.hook_inicial || parsed.opening_hook,
+      500
+    );
+    const script = cleanString(
+      parsed.script || parsed.roteiro || parsed.video_script || parsed.voiceover || parsed.narration,
+      3500
+    );
+    const caption = cleanString(
+      parsed.caption || parsed.legenda || parsed.ad_copy || parsed.texto_anuncio,
+      1800
+    );
+    const tagsValue = parsed.hashtags || parsed.tags || parsed.hashtags_sugeridas;
+    const hashtags = Array.isArray(tagsValue)
+      ? tagsValue.map((tag) => cleanString(String(tag), 60)).filter(Boolean).slice(0, 12)
+      : [];
+
+    const rawScenes = parsed.scenes || parsed.cenas || parsed.scene_plan || parsed.plano_de_cenas;
+    let scenes = Array.isArray(rawScenes) ? rawScenes.map((scene, index) => ({
+      time: cleanString(scene?.time || scene?.tempo || scene?.duration, 40) || ["0–3 s", "3–10 s", "10–20 s"][Math.min(index, 2)],
+      label: cleanString(scene?.label || scene?.title || scene?.titulo || scene?.etapa, 80) || ["GANCHO", "BENEFÍCIO", "AÇÃO"][Math.min(index, 2)],
+      description: cleanString(scene?.description || scene?.narration || scene?.text || scene?.texto || scene?.descricao, 800),
+      visual: cleanString(scene?.visual || scene?.visual_suggestion || scene?.suggested_visual || scene?.visual_sugerido, 500),
+    })).filter((scene) => scene.description || scene.visual).slice(0, 8) : [];
+
+    if (!hook || !script || !caption) {
+      // Some output formats may return the copy in another top-level field.
+      const combined = cleanString(parsed.text || parsed.content || parsed.campanha || parsed.ad, 3000);
+      if (!script && combined) {
+        return jsonResponse({
+          error: "A IA retornou uma campanha em formato diferente do esperado. Tente novamente."
+        }, 502, origin);
+      }
+      return jsonResponse({
+        error: "A resposta da IA veio incompleta. Tente gerar novamente."
+      }, 502, origin);
+    }
+
+    if (scenes.length === 0) {
+      scenes = [
+        { time: "0–3 s", label: "GANCHO", description: hook, visual: "Abra com uma cena que mostre o produto ou o problema do público." },
+        { time: "3–10 s", label: "BENEFÍCIO", description: script, visual: "Mostre o produto ou serviço em uso e destaque um benefício real." },
+        { time: "10–20 s", label: "AÇÃO", description: caption, visual: "Finalize com a marca e a chamada para ação." },
+      ];
+    }
+
+    return jsonResponse({
+      campaign: { hook, script, caption, hashtags, scenes }
+    }, 200, origin);
   },
 };
