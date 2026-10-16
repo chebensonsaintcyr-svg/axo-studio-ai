@@ -211,9 +211,31 @@ Escreva para uma empresa real local. Evite a palavra "joven" se não estiver cor
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
-            temperature: 0.75,
-            maxOutputTokens: 1400,
+            maxOutputTokens: 3000,
             responseMimeType: "application/json",
+            responseSchema: {
+              type: "OBJECT",
+              properties: {
+                hook: { type: "STRING" },
+                script: { type: "STRING" },
+                caption: { type: "STRING" },
+                hashtags: { type: "ARRAY", items: { type: "STRING" } },
+                scenes: {
+                  type: "ARRAY",
+                  items: {
+                    type: "OBJECT",
+                    properties: {
+                      time: { type: "STRING" },
+                      label: { type: "STRING" },
+                      description: { type: "STRING" },
+                      visual: { type: "STRING" }
+                    },
+                    required: ["time", "label", "description", "visual"]
+                  }
+                }
+              },
+              required: ["hook", "script", "caption", "hashtags", "scenes"]
+            }
           },
         }),
       });
