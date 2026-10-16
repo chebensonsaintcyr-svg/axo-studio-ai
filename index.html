@@ -294,6 +294,7 @@ async function generateVideo(d, c, button, imageFiles) {
   let audioContext;
   let combinedStream;
   let canvasStream;
+  const visualBitmaps = [];
   try {
     button.disabled = true;
     button.textContent = 'Preparando narração...';
@@ -322,7 +323,6 @@ async function generateVideo(d, c, button, imageFiles) {
     for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
     const audioBuffer = await audioContext.decodeAudioData(bytes.buffer.slice(0));
 
-    const visualBitmaps = [];
     if (Array.isArray(imageFiles) && imageFiles.length) {
       if (typeof createImageBitmap !== 'function') {
         throw new Error('Seu navegador não permite carregar as fotos para o vídeo. Tente usar o Chrome ou Edge atualizado.');
