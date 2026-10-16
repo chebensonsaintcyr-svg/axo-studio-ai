@@ -54,7 +54,7 @@
    <div class="field"><label for="tone">Estilo do anúncio</label><select id="tone"><option value="Direto e convincente">Direto e convincente</option><option value="Descontraído e próximo">Descontraído e próximo</option><option value="Premium e sofisticado">Premium e sofisticado</option><option value="Urgente, sem promessas enganosas">Promocional e urgente</option></select></div>
    <div class="field"><label for="platform">Formato desejado</label><select id="platform"><option value="Reels ou Stories vertical 9:16">Reels / Stories (vertical)</option><option value="Feed de Instagram ou Facebook 4:5">Feed (4:5)</option><option value="Vídeo horizontal 16:9">Vídeo horizontal (16:9)</option><option value="Texto para anúncio estático">Anúncio estático com texto</option></select></div>
    <button class="btn full" type="submit" id="generateBtn">✦ Gerar campanha</button>
-   <p class="notice">Protótipo gratuito: as sugestões são montadas no seu navegador a partir de modelos. Ainda não é uma conexão com um modelo de IA externo.</p>
+   <p class="notice">A campanha será gerada pelo serviço de IA conectado à AXO. Não inclua senhas nem informações confidenciais no briefing.</p>
   </form>
   <section class="panel output" id="output" aria-live="polite">
    <div class="output-empty" id="empty"><div class="emptyicon">✧</div><h3>Sua campanha aparecerá aqui</h3><p>Adicione as informações à esquerda e clique em “Gerar campanha”.</p></div>
@@ -70,38 +70,126 @@
 </main>
 <footer><div class="wrap foot"><span>© <span id="year"></span> AXO Studio AI. Todos os direitos reservados.</span><span>Uma primeira versão em evolução · <a href="#gerador">Testar gerador</a></span></div></footer>
 <script>
-const $=id=>document.getElementById(id);
-$('year').textContent=new Date().getFullYear();
-function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function makeCampaign(d){
- const product=d.product.trim().replace(/[.!?]+$/,'');
- const hooks=[
-  'Você está procurando uma forma melhor de '+product.toLowerCase()+'?',
-  'Conheça uma nova maneira de cuidar do que importa para você.',
-  'Sua próxima boa escolha pode começar por aqui.'
- ];
- const hook=hooks[(d.business.length+d.audience.length)%hooks.length];
- const benefits='Apresentamos '+product+'. Uma solução pensada para '+d.audience.toLowerCase()+', com atendimento próximo e informação clara para você decidir com confiança.';
- const cta=d.goal.includes('mensagens')?'Chame no direct e peça seu orçamento.':d.goal.includes('Vender')?'Fale com nossa equipe e descubra a melhor opção para você.':d.goal.includes('visitas')?'Acesse nosso site e conheça todos os detalhes.':'Conheça '+d.business+' e acompanhe as novidades.';
- const script=d.tone==='Premium e sofisticado'?'Qualidade está nos detalhes. '+benefits+' '+cta:d.tone==='Descontraído e próximo'?hook+' '+benefits+' Bora conversar? '+cta:d.tone==='Promocional e urgente'?hook+' '+benefits+' Não deixe para depois: '+cta:hook+' '+benefits+' '+cta;
- const captions=[
-  {time:'0–3 s',label:'GANCHO',desc:hook,visual:'Close de um produto ou uma cena que mostre o problema do cliente.'},
-  {time:'3–9 s',label:'VALOR',desc:benefits,visual:'Mostre o serviço ou produto em uso; destaque um benefício real.'},
-  {time:'9–15 s',label:'AÇÃO',desc:cta,visual:'Apresente a marca e a chamada para ação na tela.'}
- ];
- return {hook,script,caption:d.business+' | '+product+'. '+cta,hashtags:['#'+d.business.replace(/[^\p{L}\p{N}]/gu,''),'#empreendedorismo','#anuncios','#marketingdigital'],captions};
+const $ = id => document.getElementById(id);
+$('year').textContent = new Date().getFullYear();
+
+function esc(value) {
+  return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) {
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
 }
-$('campaignForm').addEventListener('submit',e=>{
- e.preventDefault();
- const d={business:$('business').value.trim(),product:$('product').value.trim(),audience:$('audience').value.trim(),goal:$('goal').value,tone:$('tone').value,platform:$('platform').value};
- if(!d.business||!d.product||!d.audience)return;
- const c=makeCampaign(d);
- const scenes=c.captions.map(s=>'<div style="border-left:2px solid #8b5cf6;padding:2px 0 13px 13px;margin:10px 0"><div class="tiny">'+esc(s.time)+' · '+esc(s.label)+'</div><p style="margin:4px 0 6px">'+esc(s.desc)+'</p><div class="tiny">Visual: '+esc(s.visual)+'</div></div>').join('');
- const tags=c.hashtags.map(t=>'<span class="pill">'+esc(t)+'</span>').join('');
- $('results').innerHTML='<div class="meta"><span class="pill">'+esc(d.platform)+'</span><span class="pill">'+esc(d.goal)+'</span></div><h3>Campanha: '+esc(d.business)+'</h3><h4>Gancho inicial</h4><p>'+esc(c.hook)+'</p><h4>Roteiro sugerido</h4><p id="scriptText">'+esc(c.script)+'</p><h4>Legenda do anúncio</h4><p id="captionText">'+esc(c.caption)+'</p><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px">'+tags+'</div><h4>Plano de cenas</h4>'+scenes+'<div class="output-actions"><button type="button" class="btn" id="copyBtn">Copiar campanha</button><button type="button" class="btn secondary" id="downloadBtn">Baixar .txt</button></div><p class="notice">Revise fatos, preços e promessas antes de publicar. Este protótipo não cria vídeo nem publica anúncios automaticamente.</p>';
- $('empty').classList.add('hidden');$('results').classList.remove('hidden');
- $('copyBtn').addEventListener('click',async()=>{const text='AXO STUDIO AI — '+d.business+'\n\nGANCHO\n'+c.hook+'\n\nROTEIRO\n'+c.script+'\n\nLEGENDA\n'+c.caption+'\n\n'+c.hashtags.join(' ')+'\n\nCENAS\n'+c.captions.map(s=>s.time+' - '+s.label+'\n'+s.desc+'\nVisual: '+s.visual).join('\n\n');try{await navigator.clipboard.writeText(text);$('copyBtn').textContent='✓ Copiado!';}catch(err){const t=document.createElement('textarea');t.value=text;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();$('copyBtn').textContent='✓ Copiado!';}});
- $('downloadBtn').addEventListener('click',()=>{const text='AXO STUDIO AI\nCampanha: '+d.business+'\n\nGANCHO\n'+c.hook+'\n\nROTEIRO\n'+c.script+'\n\nLEGENDA\n'+c.caption+'\n\nHASHTAGS\n'+c.hashtags.join(' ')+'\n\nPLANO DE CENAS\n'+c.captions.map(s=>s.time+' - '+s.label+'\n'+s.desc+'\nVisual: '+s.visual).join('\n\n');const blob=new Blob([text],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='axo-campanha.txt';a.click();URL.revokeObjectURL(url);});
+
+function toCampaignText(d, c) {
+  const scenes = Array.isArray(c.scenes) ? c.scenes.map(function (s) {
+    return (s.time || '') + ' - ' + (s.label || '') + '\n' +
+      (s.description || '') + '\nVisual: ' + (s.visual || '');
+  }).join('\n\n') : '';
+  const hashtags = Array.isArray(c.hashtags) ? c.hashtags.join(' ') : '';
+  return 'AXO STUDIO AI — ' + d.business + '\n\nGANCHO\n' + c.hook +
+    '\n\nROTEIRO\n' + c.script + '\n\nLEGENDA\n' + c.caption +
+    '\n\nHASHTAGS\n' + hashtags + '\n\nPLANO DE CENAS\n' + scenes;
+}
+
+function showError(message) {
+  $('empty').classList.add('hidden');
+  $('results').classList.remove('hidden');
+  $('results').innerHTML = '<div class="ico" style="margin-bottom:14px">!</div><h3>Não foi possível gerar a campanha</h3><p>' +
+    esc(message || 'Ocorreu um erro. Tente novamente em instantes.') +
+    '</p><p class="notice">Se o problema continuar, confira se o Worker está publicado e se a chave GEMINI_API_KEY está configurada como Secret no Cloudflare.</p>';
+}
+
+function renderCampaign(d, c) {
+  if (!c || !c.hook || !c.script || !c.caption || !Array.isArray(c.scenes)) {
+    throw new Error('A IA respondeu, mas o formato da campanha estava incompleto. Tente novamente.');
+  }
+  const scenes = c.scenes.map(function (s) {
+    return '<div style="border-left:2px solid #8b5cf6;padding:2px 0 13px 13px;margin:10px 0">' +
+      '<div class="tiny">' + esc(s.time) + ' · ' + esc(s.label) + '</div>' +
+      '<p style="margin:4px 0 6px">' + esc(s.description) + '</p>' +
+      '<div class="tiny">Visual: ' + esc(s.visual) + '</div></div>';
+  }).join('');
+  const hashtags = (Array.isArray(c.hashtags) ? c.hashtags : []).map(function (tag) {
+    return '<span class="pill">' + esc(String(tag).startsWith('#') ? tag : '#' + tag) + '</span>';
+  }).join('');
+  $('results').innerHTML =
+    '<div class="meta"><span class="pill">' + esc(d.platform) + '</span><span class="pill">' + esc(d.goal) + '</span><span class="pill">Gerado por IA</span></div>' +
+    '<h3>Campanha: ' + esc(d.business) + '</h3>' +
+    '<h4>Gancho inicial</h4><p>' + esc(c.hook) + '</p>' +
+    '<h4>Roteiro sugerido</h4><p>' + esc(c.script) + '</p>' +
+    '<h4>Legenda do anúncio</h4><p>' + esc(c.caption) + '</p>' +
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px">' + hashtags + '</div>' +
+    '<h4>Plano de cenas</h4>' + scenes +
+    '<div class="output-actions"><button type="button" class="btn" id="copyBtn">Copiar campanha</button><button type="button" class="btn secondary" id="downloadBtn">Baixar .txt</button></div>' +
+    '<p class="notice">Revise os dados, preços e promessas antes de publicar. Esta versão gera textos e planejamento; ainda não cria o arquivo de vídeo nem publica anúncios automaticamente.</p>';
+
+  $('empty').classList.add('hidden');
+  $('results').classList.remove('hidden');
+
+  $('copyBtn').addEventListener('click', async function () {
+    const text = toCampaignText(d, c);
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (err) {
+      const area = document.createElement('textarea');
+      area.value = text;
+      document.body.appendChild(area);
+      area.select();
+      document.execCommand('copy');
+      area.remove();
+    }
+    $('copyBtn').textContent = '✓ Copiado!';
+  });
+
+  $('downloadBtn').addEventListener('click', function () {
+    const blob = new Blob([toCampaignText(d, c)], {type:'text/plain;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'axo-campanha.txt';
+    link.click();
+    URL.revokeObjectURL(url);
+  });
+}
+
+$('campaignForm').addEventListener('submit', async function (event) {
+  event.preventDefault();
+  const d = {
+    business: $('business').value.trim(),
+    product: $('product').value.trim(),
+    audience: $('audience').value.trim(),
+    goal: $('goal').value,
+    tone: $('tone').value,
+    platform: $('platform').value
+  };
+  if (!d.business || !d.product || !d.audience) return;
+
+  const button = $('generateBtn');
+  const originalText = button.textContent;
+  button.disabled = true;
+  button.textContent = '✦ Gerando com IA...';
+  button.style.opacity = '0.75';
+
+  try {
+    const response = await fetch('https://axo-studio-ai-api.chebensonsaintcyr.workers.dev/', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(d)
+    });
+    let data;
+    try {
+      data = await response.json();
+    } catch (err) {
+      throw new Error('O servidor retornou uma resposta inválida. Confira o Worker e tente novamente.');
+    }
+    if (!response.ok) throw new Error(data && data.error ? data.error : 'Erro do servidor (' + response.status + ').');
+    renderCampaign(d, data.campaign);
+  } catch (err) {
+    showError(err && err.message ? err.message : 'Não foi possível conectar à IA. Confira sua conexão e tente novamente.');
+  } finally {
+    button.disabled = false;
+    button.textContent = originalText;
+    button.style.opacity = '1';
+  }
 });
 </script>
 </body>
