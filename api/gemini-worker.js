@@ -95,6 +95,76 @@ export default {
       return jsonResponse({ error: "O pedido precisa estar em formato JSON." }, 400, origin);
     }
 
+    if (input.action === "speech") {
+      const speechText = cleanString(input.text, 1800);
+      const requestedVoice = cleanString(input.voice, 32);
+      const allowedVoices = new Set(["Kore", "Puck", "Charon", "Fenrir", "Aoede", "Leda", "Orus", "Zephyr"]);
+      const voice = allowedVoices.has(requestedVoice) ? requestedVoice : "Kore";
+      const style = cleanString(input.style, 180) || "Warm, confident, clear advertising narration in natural Brazilian Portuguese, medium pace.";
+      if (!speechText) {
+        return jsonResponse({ error: "Não há texto para narrar." }, 400, origin);
+      }
+
+      let speechResponse;
+      try {
+        speechResponse = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": env.GEMINI_API_KEY,
+          },
+          body: JSON.stringify({
+            model: "gemini-3.8-flash-tts",
+            input: [{
+              type: "user_input",
+              content: [{
+                type: "text",
+                text: speechText,
+                annotations: [{
+                  type: "speech_metadata",
+                  style,
+                }],
+              }],
+            }],
+            response_format: { type: "audio" },
+            generation_config: {
+              speech_config: [{ voice }],
+            },
+          }),
+        });
+      } catch {
+        return jsonResponse({ error: "Não foi possível conectar ao serviço de voz. Tente novamente." }, 502, origin);
+      }
+
+      if (!speechResponse.ok) {
+        const status = speechResponse.status === 429 ? 429 : 502;
+        const message = speechResponse.status === 429
+          ? "A voz IA atingiu um limite temporário. Aguarde e tente novamente."
+          : "O serviço de voz não conseguiu gerar a narração. Confira a chave Gemini e tente novamente.";
+        return jsonResponse({ error: message }, status, origin);
+      }
+
+      let speechData;
+      try {
+        speechData = await speechResponse.json();
+      } catch {
+        return jsonResponse({ error: "O serviço de voz retornou uma resposta inválida." }, 502, origin);
+      }
+
+      const audioPart = (speechData?.steps || [])
+        .filter((step) => step.type === "model_output")
+        .flatMap((step) => step.content || [])
+        .filter((part) => part.type === "audio" && part.data)
+        .at(-1);
+      const audioBase64 = audioPart?.data || speechData?.output_audio?.data;
+
+      if (!audioBase64) {
+        return jsonResponse({ error: "A voz IA não retornou áudio. Tente novamente." }, 502, origin);
+      }
+
+      return jsonResponse({ audioBase64, mimeType: "audio/wav" }, 200, origin);
+    }
+
     const business = cleanString(input.business, 90);
     const product = cleanString(input.product, 700);
     const audience = cleanString(input.audience, 180);
