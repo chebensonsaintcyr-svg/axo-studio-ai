@@ -152,7 +152,7 @@ function renderCampaign(d, c) {
     '<h4>Legenda do anúncio</h4><p>' + esc(c.caption) + '</p>' +
     '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px">' + hashtags + '</div>' +
     '<h4>Plano de cenas</h4>' + scenes +
-    '<div class="feature" style="margin-top:18px">
+    `<div class="feature" style="margin-top:18px">
       <h3 style="margin-top:0">Imagens gratuitas para seu vídeo</h3>
       <p class="tiny">A AXO procura imagens no Wikimedia Commons. Confira o autor, a licença e a página da imagem antes de usar em anúncios comerciais.</p>
       <div class="field"><label for="commonsQuery">O que devemos procurar?</label><input id="commonsQuery" maxlength="140" value="${esc(d.product)}" placeholder="Ex.: motorcycle mechanic"></div>
@@ -162,8 +162,9 @@ function renderCampaign(d, c) {
       </div>
       <p class="tiny" id="commonsCount">Quando disponíveis, até 3 opções serão marcadas para começar; você pode alterar a seleção.</p>
     </div>
-    <div class="field" style="margin-top:18px"><label for="videoImages">Ou adicione suas próprias fotos (opcional, até 4 no total)</label><input id="videoImages" type="file" accept="image/*" multiple><p class="tiny">As fotos escolhidas no seu computador ficam no navegador. O total de imagens por vídeo é 4.</p></div><div class="output-actions"><button type="button" class="btn" id="videoBtn">🎬 Gerar vídeo vertical com voz</button><button type="button" class="btn secondary" id="copyBtn">Copiar campanha</button><button type="button" class="btn secondary" id="downloadBtn">Baixar .txt</button></div>' +
-    '<p class="notice">O vídeo inicial usa voz gerada por IA, texto animado e identidade visual AXO. Banco de imagens e exportação MP4 serão melhorias posteriores.</p>';
+    <div class="field" style="margin-top:18px"><label for="videoImages">Ou adicione suas próprias fotos (opcional, até 4 no total)</label><input id="videoImages" type="file" accept="image/*" multiple><p class="tiny">As fotos escolhidas no seu computador ficam no navegador. O total de imagens por vídeo é 4.</p></div>
+    <div class="output-actions"><button type="button" class="btn" id="videoBtn">🎬 Gerar vídeo vertical com voz</button><button type="button" class="btn secondary" id="copyBtn">Copiar campanha</button><button type="button" class="btn secondary" id="downloadBtn">Baixar .txt</button></div>`,
+    '<p class="notice">O vídeo usa fotos selecionadas, narração por IA e identidade visual AXO. Confira as licenças e atribuições no painel antes de usar imagens em anúncios comerciais.</p>';
 
   $('empty').classList.add('hidden');
   $('results').classList.remove('hidden');
@@ -184,7 +185,12 @@ function renderCampaign(d, c) {
   });
 
   $('downloadBtn').addEventListener('click', function () {
-    const blob = new Blob([toCampaignText(d, c) + '\\n\\nIMAGENS E LICENÇAS\\nAs fontes e licenças aparecem em cada cartão de imagem no painel da AXO. Confira a página original antes de reutilizar.'], {type:'text/plain;charset=utf-8'});
+    const attributionLines = (typeof selectedCommonsIndexes === 'function' ? selectedCommonsIndexes() : [])
+      .map(function (index) { return buildCommonsCredit(commonsResults[index]); })
+      .filter(Boolean);
+    const attributionText = attributionLines.length ? attributionLines.join('\\n') : 'Nenhuma imagem do Wikimedia Commons selecionada para este momento.';
+    const textFile = toCampaignText(d, c) + '\\n\\nIMAGENS E LICENÇAS\\n' + attributionText;
+    const blob = new Blob([textFile], {type:'text/plain;charset=utf-8'});
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
