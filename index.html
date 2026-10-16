@@ -54,7 +54,7 @@
    <div class="field"><label for="tone">Estilo do anúncio</label><select id="tone"><option value="Direto e convincente">Direto e convincente</option><option value="Descontraído e próximo">Descontraído e próximo</option><option value="Premium e sofisticado">Premium e sofisticado</option><option value="Urgente, sem promessas enganosas">Promocional e urgente</option></select></div>
    <div class="field"><label for="platform">Formato desejado</label><select id="platform"><option value="Reels ou Stories vertical 9:16">Reels / Stories (vertical)</option><option value="Feed de Instagram ou Facebook 4:5">Feed (4:5)</option><option value="Vídeo horizontal 16:9">Vídeo horizontal (16:9)</option><option value="Texto para anúncio estático">Anúncio estático com texto</option></select></div>
    <button class="btn full" type="submit" id="generateBtn">✦ Gerar campanha</button>
-   <p class="notice">A campanha será gerada pelo serviço de IA conectado à AXO. Não inclua senhas nem informações confidenciais no briefing.</p>
+   <p class="notice">A campanha será gerada pela IA. Depois você poderá montar um vídeo vertical com voz sintética e identidade visual AXO. Não inclua dados confidenciais no briefing.</p>
   </form>
   <section class="panel output" id="output" aria-live="polite">
    <div class="output-empty" id="empty"><div class="emptyicon">✧</div><h3>Sua campanha aparecerá aqui</h3><p>Adicione as informações à esquerda e clique em “Gerar campanha”.</p></div>
@@ -93,14 +93,14 @@ function toCampaignText(d, c) {
 function showError(message) {
   $('empty').classList.add('hidden');
   $('results').classList.remove('hidden');
-  $('results').innerHTML = '<div class="ico" style="margin-bottom:14px">!</div><h3>Não foi possível gerar a campanha</h3><p>' +
+  $('results').innerHTML = '<div class="ico" style="margin-bottom:14px">!</div><h3>Não foi possível concluir</h3><p>' +
     esc(message || 'Ocorreu um erro. Tente novamente em instantes.') +
-    '</p><p class="notice">Se o problema continuar, confira se o Worker está publicado e se a chave GEMINI_API_KEY está configurada como Secret no Cloudflare.</p>';
+    '</p><p class="notice">Confira se o Worker está publicado e se GEMINI_API_KEY foi configurada como Secret no Cloudflare.</p>';
 }
 
 function renderCampaign(d, c) {
   if (!c || !c.hook || !c.script || !c.caption || !Array.isArray(c.scenes)) {
-    throw new Error('A IA respondeu, mas o formato da campanha estava incompleto. Tente novamente.');
+    throw new Error('A resposta da IA estava incompleta. Tente gerar de novo.');
   }
   const scenes = c.scenes.map(function (s) {
     return '<div style="border-left:2px solid #8b5cf6;padding:2px 0 13px 13px;margin:10px 0">' +
@@ -119,8 +119,8 @@ function renderCampaign(d, c) {
     '<h4>Legenda do anúncio</h4><p>' + esc(c.caption) + '</p>' +
     '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px">' + hashtags + '</div>' +
     '<h4>Plano de cenas</h4>' + scenes +
-    '<div class="output-actions"><button type="button" class="btn" id="copyBtn">Copiar campanha</button><button type="button" class="btn secondary" id="downloadBtn">Baixar .txt</button></div>' +
-    '<p class="notice">Revise os dados, preços e promessas antes de publicar. Esta versão gera textos e planejamento; ainda não cria o arquivo de vídeo nem publica anúncios automaticamente.</p>';
+    '<div class="output-actions"><button type="button" class="btn" id="videoBtn">🎬 Gerar vídeo vertical com voz</button><button type="button" class="btn secondary" id="copyBtn">Copiar campanha</button><button type="button" class="btn secondary" id="downloadBtn">Baixar .txt</button></div>' +
+    '<p class="notice">O vídeo inicial usa voz gerada por IA, texto animado e identidade visual AXO. Banco de imagens e exportação MP4 serão melhorias posteriores.</p>';
 
   $('empty').classList.add('hidden');
   $('results').classList.remove('hidden');
@@ -149,6 +149,232 @@ function renderCampaign(d, c) {
     link.click();
     URL.revokeObjectURL(url);
   });
+
+  $('videoBtn').addEventListener('click', function () {
+    generateVideo(d, c, $('videoBtn'));
+  });
+}
+
+function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
+  const words = String(text || '').split(/\s+/);
+  const lines = [];
+  let line = '';
+  for (let i = 0; i < words.length; i++) {
+    const test = line ? line + ' ' + words[i] : words[i];
+    if (ctx.measureText(test).width > maxWidth && line) {
+      lines.push(line);
+      line = words[i];
+    } else {
+      line = test;
+    }
+  }
+  if (line) lines.push(line);
+  const visible = lines.slice(0, maxLines || 6);
+  if (lines.length > visible.length && visible.length) {
+    let last = visible[visible.length - 1];
+    while (ctx.measureText(last + '…').width > maxWidth && last.length > 4) last = last.slice(0, -1);
+    visible[visible.length - 1] = last + '…';
+  }
+  visible.forEach(function (item, i) { ctx.fillText(item, x, y + i * lineHeight); });
+  return visible.length;
+}
+
+function drawVideoFrame(ctx, d, c, elapsed, duration) {
+  const w = ctx.canvas.width, h = ctx.canvas.height;
+  const progress = Math.min(1, elapsed / duration);
+  const sceneList = Array.isArray(c.scenes) && c.scenes.length ? c.scenes : [
+    {label:'GANCHO', description:c.hook},
+    {label:'BENEFÍCIO', description:c.script},
+    {label:'AÇÃO', description:c.caption}
+  ];
+  const index = Math.min(sceneList.length - 1, Math.floor(progress * sceneList.length));
+  const scene = sceneList[index];
+  const p = (progress * sceneList.length) % 1;
+
+  const bg = ctx.createLinearGradient(0, 0, w, h);
+  bg.addColorStop(0, '#090914');
+  bg.addColorStop(0.5, '#211342');
+  bg.addColorStop(1, '#09232b');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.globalAlpha = 0.25;
+  const glow = ctx.createRadialGradient(530 + Math.sin(elapsed * 0.7) * 80, 310 + Math.cos(elapsed * 0.6) * 65, 10, 530, 310, 430);
+  glow.addColorStop(0, '#a78bfa');
+  glow.addColorStop(1, 'rgba(139,92,246,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, w, h);
+  ctx.globalAlpha = 1;
+
+  ctx.strokeStyle = 'rgba(196,181,253,0.16)';
+  ctx.lineWidth = 2;
+  for (let r = 110; r <= 390; r += 70) {
+    ctx.beginPath();
+    ctx.arc(560 + Math.sin(elapsed * 0.35) * 35, 335, r, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  ctx.fillStyle = 'rgba(255,255,255,0.08)';
+  ctx.fillRect(42, 48, 230, 54);
+  ctx.fillStyle = '#a78bfa';
+  ctx.fillRect(42, 48, 6, 54);
+  ctx.font = 'bold 20px Arial, sans-serif';
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText('AXO STUDIO AI', 62, 80);
+  ctx.font = '14px Arial, sans-serif';
+  ctx.fillStyle = '#c4b5fd';
+  ctx.fillText('CAMPANHA CRIADA COM IA', 44, 145);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.12)';
+  ctx.fillRect(44, 202, 108, 40);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 16px Arial, sans-serif';
+  ctx.fillText(String(index + 1).padStart(2, '0') + ' / ' + String(sceneList.length).padStart(2, '0'), 60, 228);
+
+  ctx.fillStyle = '#a78bfa';
+  ctx.font = 'bold 22px Arial, sans-serif';
+  ctx.fillText(String(scene.label || 'CAMPANHA').toUpperCase().slice(0, 28), 46, 330);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 48px Arial, sans-serif';
+  const mainText = scene.description || (index === 0 ? c.hook : index === sceneList.length - 1 ? c.caption : c.script);
+  const lineCount = wrapCanvasText(ctx, mainText, 46, 405, 620, 62, 7);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.10)';
+  ctx.fillRect(44, 900, 632, 3);
+  ctx.fillStyle = '#a78bfa';
+  ctx.fillRect(44, 900, 632 * progress, 3);
+
+  ctx.fillStyle = '#c6c6dc';
+  ctx.font = '20px Arial, sans-serif';
+  const businessText = d.business.length > 33 ? d.business.slice(0, 30) + '…' : d.business;
+  ctx.fillText(businessText, 46, 955);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 28px Arial, sans-serif';
+  const endText = index === sceneList.length - 1 ? c.caption : 'Uma nova ideia para sua marca.';
+  wrapCanvasText(ctx, endText, 46, 1015, 620, 38, 3);
+
+  ctx.fillStyle = '#a78bfa';
+  ctx.fillRect(46, 1160, 90, 5);
+  ctx.fillStyle = '#c6c6dc';
+  ctx.font = '16px Arial, sans-serif';
+  ctx.fillText('ROTEIRO • VOZ IA • FORMATO VERTICAL', 46, 1200);
+  ctx.fillStyle = 'rgba(255,255,255,0.65)';
+  ctx.font = '14px Arial, sans-serif';
+  ctx.fillText('Criado com AXO Studio AI', 46, 1240);
+}
+
+async function generateVideo(d, c, button) {
+  const originalText = button.textContent;
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  if (!AudioCtx || !HTMLCanvasElement.prototype.captureStream || !window.MediaRecorder) {
+    showError('Este navegador não tem os recursos necessários para gerar o vídeo. Tente usar o Chrome ou Edge atualizado no notebook.');
+    return;
+  }
+
+  let audioContext;
+  let combinedStream;
+  let canvasStream;
+  try {
+    button.disabled = true;
+    button.textContent = 'Preparando narração...';
+    audioContext = new AudioCtx();
+    await audioContext.resume();
+
+    const response = await fetch('https://axo-studio-ai-api.chebensonsaintcyr.workers.dev/', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        action: 'speech',
+        text: c.script,
+        voice: 'Kore',
+        style: 'Natural, confident, upbeat Brazilian Portuguese advertising narration with clear diction and a medium-fast pace.'
+      })
+    });
+    let data;
+    try { data = await response.json(); }
+    catch (err) { throw new Error('O servidor de voz retornou uma resposta inválida.'); }
+    if (!response.ok) throw new Error(data && data.error ? data.error : 'Não foi possível gerar a voz (' + response.status + ').');
+    if (!data.audioBase64) throw new Error('O serviço de voz não retornou áudio. Tente de novo mais tarde.');
+
+    button.textContent = 'Montando vídeo vertical...';
+    const binary = atob(data.audioBase64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    const audioBuffer = await audioContext.decodeAudioData(bytes.buffer.slice(0));
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 720;
+    canvas.height = 1280;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Não foi possível iniciar o editor de vídeo no navegador.');
+
+    canvasStream = canvas.captureStream(30);
+    const audioDestination = audioContext.createMediaStreamDestination();
+    const source = audioContext.createBufferSource();
+    source.buffer = audioBuffer;
+    source.connect(audioDestination);
+    combinedStream = new MediaStream([
+      ...canvasStream.getVideoTracks(),
+      ...audioDestination.stream.getAudioTracks()
+    ]);
+
+    const mimeChoices = ['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];
+    const selectedMime = mimeChoices.find(function (mime) { return MediaRecorder.isTypeSupported(mime); });
+    const recorder = selectedMime
+      ? new MediaRecorder(combinedStream, {mimeType:selectedMime, videoBitsPerSecond:2200000})
+      : new MediaRecorder(combinedStream);
+    const chunks = [];
+    const videoDuration = audioBuffer.duration + 1.2;
+    const startTime = performance.now();
+    let rafId = 0;
+    function paint(now) {
+      const elapsed = Math.min(videoDuration, (now - startTime) / 1000);
+      drawVideoFrame(ctx, d, c, elapsed, videoDuration);
+      if (elapsed < videoDuration) rafId = requestAnimationFrame(paint);
+    }
+
+    const stopped = new Promise(function (resolve, reject) {
+      recorder.ondataavailable = function (event) { if (event.data && event.data.size) chunks.push(event.data); };
+      recorder.onstop = resolve;
+      recorder.onerror = function () { reject(new Error('O navegador encontrou um erro ao gravar o vídeo.')); };
+    });
+
+    recorder.start(250);
+    drawVideoFrame(ctx, d, c, 0, videoDuration);
+    rafId = requestAnimationFrame(paint);
+    source.onended = function () {
+      setTimeout(function () {
+        if (recorder.state !== 'inactive') recorder.stop();
+      }, 900);
+    };
+    source.start(0);
+    await stopped;
+    cancelAnimationFrame(rafId);
+
+    const blob = new Blob(chunks, {type:recorder.mimeType || 'video/webm'});
+    if (!blob.size) throw new Error('O vídeo foi criado vazio. Tente novamente no Chrome ou Edge.');
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const safeName = d.business.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '').toLowerCase() || 'campanha';
+    link.href = url;
+    link.download = 'axo-' + safeName + '.webm';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 30000);
+    button.textContent = '✓ Vídeo baixado!';
+  } catch (err) {
+    showError(err && err.message ? err.message : 'Não foi possível criar o vídeo. Tente novamente.');
+  } finally {
+    if (combinedStream) combinedStream.getTracks().forEach(function (track) { track.stop(); });
+    if (canvasStream) canvasStream.getTracks().forEach(function (track) { track.stop(); });
+    if (audioContext && audioContext.state !== 'closed') {
+      try { await audioContext.close(); } catch (err) {}
+    }
+    button.disabled = false;
+    if (button.isConnected && button.textContent !== '✓ Vídeo baixado!') button.textContent = originalText;
+  }
 }
 
 $('campaignForm').addEventListener('submit', async function (event) {
@@ -162,13 +388,11 @@ $('campaignForm').addEventListener('submit', async function (event) {
     platform: $('platform').value
   };
   if (!d.business || !d.product || !d.audience) return;
-
   const button = $('generateBtn');
   const originalText = button.textContent;
   button.disabled = true;
   button.textContent = '✦ Gerando com IA...';
   button.style.opacity = '0.75';
-
   try {
     const response = await fetch('https://axo-studio-ai-api.chebensonsaintcyr.workers.dev/', {
       method: 'POST',
@@ -176,11 +400,8 @@ $('campaignForm').addEventListener('submit', async function (event) {
       body: JSON.stringify(d)
     });
     let data;
-    try {
-      data = await response.json();
-    } catch (err) {
-      throw new Error('O servidor retornou uma resposta inválida. Confira o Worker e tente novamente.');
-    }
+    try { data = await response.json(); }
+    catch (err) { throw new Error('O servidor retornou uma resposta inválida. Confira o Worker e tente novamente.'); }
     if (!response.ok) throw new Error(data && data.error ? data.error : 'Erro do servidor (' + response.status + ').');
     renderCampaign(d, data.campaign);
   } catch (err) {
