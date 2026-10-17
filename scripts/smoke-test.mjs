@@ -9,6 +9,8 @@ const html = readFileSync("index.html", "utf8");
 const workerSource = readFileSync("api/gemini-worker.js", "utf8");
 const robotsSource = readFileSync("robots.txt", "utf8");
 const sitemapSource = readFileSync("sitemap.xml", "utf8");
+const wranglerSource = readFileSync("wrangler.toml", "utf8");
+const deployWorkerSource = readFileSync(".github/workflows/deploy-worker.yml", "utf8");
 
 function report(name) {
   process.stdout.write("PASS  " + name + "\n");
@@ -79,6 +81,13 @@ assert.ok(robotsSource.includes("Sitemap: https://chebensonsaintcyr-svg.github.i
 assert.ok(sitemapSource.includes("<urlset") && sitemapSource.includes("<loc>https://chebensonsaintcyr-svg.github.io/axo-studio-ai/</loc>"),
   "sitemap.xml should list the canonical public site URL.");
 report("Search-engine files and canonical public URL");
+
+assert.ok(wranglerSource.includes('name = "axo-studio-ai-api"'), "Wrangler config should target the existing AXO Worker.");
+assert.ok(wranglerSource.includes('main = "api/gemini-worker.js"'), "Wrangler config should deploy the hardened API Worker source.");
+assert.ok(deployWorkerSource.includes("workflow_dispatch:"), "Cloudflare deployment should remain manual until credentials are configured.");
+assert.ok(deployWorkerSource.includes("secrets.CLOUDFLARE_API_TOKEN") && deployWorkerSource.includes("secrets.CLOUDFLARE_ACCOUNT_ID"),
+  "Deployment workflow should read Cloudflare credentials from GitHub Secrets, not source code.");
+report("Cloudflare Worker deploy configuration and secret-safe workflow");
 
 // 3. Parse the Cloudflare Worker as an ES module.
 const tempPath = join(tmpdir(), "axo-worker-smoke-test-" + process.pid + ".mjs");
