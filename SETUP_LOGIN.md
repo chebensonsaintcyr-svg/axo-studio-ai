@@ -64,6 +64,7 @@ O limite por usuário entre solicitações sucessivas também existe; se o Supab
 - Entrar e sair da conta.
 - Sessão persistente no navegador.
 - Recuperação e redefinição de senha por e-mail.
+- Estúdio de narrações dos três Reels AXO: gera três faixas com a voz Fenrir e estilo masculino energético; requer sessão autenticada e disponibiliza pré-visualização/download no navegador.
 - Proteção da API de campanhas e narração por token validado no servidor.
 - A tela de exemplo fica disponível sem conta; chamadas reais de IA exigem login.
 
