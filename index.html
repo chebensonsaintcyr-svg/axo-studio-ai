@@ -105,6 +105,17 @@ html[data-theme="light"] .theme-toolbar select:focus{outline-color:#555}
 @media(max-width:600px){.kit-grid{grid-template-columns:1fr}.studio-kit{padding:14px}}
 
 
+/* Guided campaign workflow: jump between the three production stages */
+.guided-progress{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:14px 0 18px;padding:8px;border:1px solid #3a301d;border-radius:14px;background:linear-gradient(135deg,#14120d,#090909)}
+.guided-progress button{display:flex;align-items:center;gap:9px;min-width:0;text-align:left;border:1px solid #302819;border-radius:10px;background:#0b0b0b;color:#ece8dd;padding:11px 10px;cursor:pointer;font:inherit;font-size:12px;font-weight:750;transition:border-color .2s,background .2s}
+.guided-progress button:hover,.guided-progress button:focus-visible{border-color:#d7b45a;background:#211b0e;outline:none}
+.guided-progress .guided-number{display:grid;place-items:center;flex:0 0 27px;width:27px;height:27px;border-radius:50%;border:1px solid #8d7137;color:#e4c575;font-size:11px}
+.guided-progress .guided-label{overflow-wrap:anywhere}
+.guided-next{margin:14px 0 8px}
+#campaignStepTitle,#studioKitSection,#videoProductionSection{scroll-margin-top:18px}
+.guided-focus{outline:1px solid #d7b45a;outline-offset:7px;border-radius:4px;transition:outline-color .3s}
+@media(max-width:480px){.guided-progress{gap:5px;padding:6px}.guided-progress button{display:flex;flex-direction:column;align-items:flex-start;gap:5px;padding:8px 6px;font-size:10px}.guided-progress .guided-number{width:24px;height:24px;flex-basis:24px}}
+
 /* AXO organization pass: clearer steps, compact cards, and optional panels */
 .result-step-heading{margin:18px 0 14px;padding:3px 0 12px;border-bottom:1px solid #342b18}
 .result-step-heading .step-label{display:inline-block;color:#d7b45a;font-size:10px;font-weight:850;letter-spacing:1.5px;margin-bottom:7px}
@@ -400,15 +411,21 @@ function renderCampaign(d, c, fromHistory) {
     return '<span class="pill">' + esc(String(tag).startsWith('#') ? tag : '#' + tag) + '</span>';
   }).join('');
   $('results').innerHTML =
+    '<nav class="guided-progress" aria-label="Navegar pelas etapas da campanha">' +
+    '<button type="button" data-guided-target="#campaignStepTitle"><span class="guided-number">01</span><span class="guided-label">Campanha</span></button>' +
+    '<button type="button" data-guided-target="#studioKitSection"><span class="guided-number">02</span><span class="guided-label">Direção criativa</span></button>' +
+    '<button type="button" data-guided-target="#videoProductionSection"><span class="guided-number">03</span><span class="guided-label">Vídeo</span></button>' +
+    '</nav>' +
     '<div class="meta"><span class="pill">' + esc(d.platform) + '</span><span class="pill">' + esc(d.goal) + '</span><span class="pill">' + esc(d.isExample ? 'Exemplo demonstrativo · sem chamada à IA' : 'Gerado por IA') + '</span></div>' +
     (d.isExample ? '<p class="notice">Este é um exemplo fictício para mostrar o formato. O conteúdo personalizado será gerado quando você tocar em “Gerar minha campanha com IA”.</p>' : '') +
-    '<div class="result-step-heading"><span class="step-label">ETAPA 1 · CAMPANHA</span><h3>Campanha para ' + esc(d.business) + '</h3><p class="step-hint">Revise o texto primeiro. Depois monte o visual e o vídeo.</p></div>' +
+    '<div class="result-step-heading" id="campaignStepTitle"><span class="step-label">ETAPA 1 · CAMPANHA</span><h3>Campanha para ' + esc(d.business) + '</h3><p class="step-hint">Revise o texto primeiro. Depois monte o visual e o vídeo.</p></div>' +
     '<div class="copy-card"><h4>Gancho inicial</h4><p>' + esc(c.hook) + '</p></div>' +
     '<div class="copy-card"><h4>Roteiro sugerido</h4><p>' + esc(c.script) + '</p></div>' +
     '<div class="copy-card"><h4>Legenda do anúncio</h4><p>' + esc(c.caption) + '</p></div>' +
     '<div class="copy-card"><h4>Hashtags</h4><div class="hashtags-wrap">' + hashtags + '</div></div>' +
     '<div class="copy-card"><h4>Plano de cenas</h4><div class="scene-list">' + scenes + '</div></div>' +
-    `<section class="studio-kit" aria-labelledby="studioKitTitle">
+    '<button type="button" class="btn full guided-next" data-guided-target="#studioKitSection">Continuar para direção criativa →</button>' +
+    `<section class="studio-kit" id="studioKitSection" aria-labelledby="studioKitTitle">
       <span class="step-label">ETAPA 2 · DIREÇÃO CRIATIVA</span>
       <h3 id="studioKitTitle">Estúdio criativo AXO</h3>
       <p class="kit-lead">Escolha a direção visual, o clima musical e o formato. O AXO monta prompts e um plano de produção prontos para usar nas suas ferramentas criativas.</p>
@@ -462,7 +479,8 @@ function renderCampaign(d, c, fromHistory) {
     <div class="field" style="margin-top:18px"><label for="videoImages">Ou adicione suas próprias fotos (opcional, até 4 no total)</label><input id="videoImages" type="file" accept="image/*" multiple><p class="tiny">As fotos escolhidas no seu computador ficam no navegador. O total de imagens por vídeo é 4.</p></div>
       </div>
     </details>
-    <section class="result-video-step" aria-label="Etapa 3: gerar vídeo">
+    <button type="button" class="btn full guided-next" data-guided-target="#videoProductionSection">Continuar para vídeo →</button>
+    <section class="result-video-step" id="videoProductionSection" aria-label="Etapa 3: gerar vídeo">
       <div class="result-step-heading"><span class="step-label">ETAPA 3 · VÍDEO</span><h3>Transforme o roteiro em vídeo</h3><p class="step-hint">Ouça a narração primeiro. Depois gere o vídeo com a mesma faixa de áudio.</p></div>
     <div class="output-actions"><button type="button" class="btn secondary" id="previewVoiceBtn">🎧 Ouvir narração primeiro</button><button type="button" class="btn" id="videoBtn">🎬 Gerar vídeo vertical com voz</button><button type="button" class="btn secondary" id="copyBtn">Copiar campanha</button><button type="button" class="btn secondary" id="downloadBtn">Baixar .txt</button><button type="button" class="btn secondary" id="whatsappBtn">Compartilhar no WhatsApp</button></div>
     <audio id="voicePreviewPlayer" controls preload="none" style="display:none;width:100%;margin-top:12px"></audio>
@@ -472,6 +490,15 @@ function renderCampaign(d, c, fromHistory) {
 
   $('empty').classList.add('hidden');
   $('results').classList.remove('hidden');
+  $('results').querySelectorAll('[data-guided-target]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      const target = $('results').querySelector(button.dataset.guidedTarget);
+      if (!target) return;
+      target.scrollIntoView({behavior:'smooth', block:'start'});
+      target.classList.add('guided-focus');
+      setTimeout(function () { target.classList.remove('guided-focus'); }, 1000);
+    });
+  });
   if (!fromHistory) saveCampaignHistory(d, c);
 
   let productionKitParts = [];
