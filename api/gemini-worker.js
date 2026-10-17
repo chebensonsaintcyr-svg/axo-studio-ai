@@ -62,15 +62,19 @@ function cleanString(value, maxLength) {
 }
 
 async function verifySupabaseSession(request, env) {
-  const supabaseUrl = cleanString(env.SUPABASE_URL, 300).replace(/\\/+$/, "");
+  let supabaseUrl = cleanString(env.SUPABASE_URL, 300);
+  while (supabaseUrl.endsWith("/")) supabaseUrl = supabaseUrl.slice(0, -1);
   const publishableKey = cleanString(env.SUPABASE_ANON_KEY, 300);
   if (!supabaseUrl || !publishableKey) {
     return { ok: false, status: 503, error: "O login ainda não foi configurado no servidor." };
   }
 
-  const authorization = request.headers.get("Authorization") || "";
-  const match = authorization.match(/^Bearer\\s+([^\\s]{16,4096})$/i);
-  if (!match) {
+  const authorization = (request.headers.get("Authorization") || "").trim();
+  if (!authorization.startsWith("Bearer ")) {
+    return { ok: false, status: 401, error: "Entre na sua conta AXO para usar este recurso." };
+  }
+  const token = authorization.slice(7).trim();
+  if (!token || token.length < 16 || token.length > 4096 || token.includes(" ")) {
     return { ok: false, status: 401, error: "Entre na sua conta AXO para usar este recurso." };
   }
 
@@ -79,7 +83,7 @@ async function verifySupabaseSession(request, env) {
       method: "GET",
       headers: {
         "apikey": publishableKey,
-        "Authorization": "Bearer " + match[1],
+        "Authorization": "Bearer " + token,
         "Accept": "application/json",
       },
     });
@@ -95,7 +99,6 @@ async function verifySupabaseSession(request, env) {
     return { ok: false, status: 502, error: "Não foi possível validar o login agora. Tente novamente." };
   }
 }
-
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("Origin") || "";
