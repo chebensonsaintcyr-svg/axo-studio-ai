@@ -88,7 +88,7 @@ for (const fragment of [
   "const AXO_SINGLE_VOICE_STYLE",
   "No second voice, dialogue, chorus, echo",
   "if (suppliedAudioBase64)",
-  "O vídeo usará exatamente o áudio aprovado aqui.",
+  "O vídeo usará exatamente esta faixa de áudio, sem gerar uma segunda voz.",
   "searchCommonsImages(d.product, true)",
   "function buildCommonsCredit",
   "id=\"historyList\"",
