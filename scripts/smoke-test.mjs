@@ -30,7 +30,12 @@ for (const fragment of [
   "function generateVideo",
   "new MediaRecorder(combinedStream",
   "searchCommonsImages(d.product, true)",
-  "function buildCommonsCredit"
+  "function buildCommonsCredit",
+  "id=\"historyList\"",
+  "function getCampaignHistory",
+  "function saveCampaignHistory",
+  "function renderHistory",
+  "localStorage.setItem(HISTORY_STORAGE_KEY"
 ]) {
   assert.ok(html.includes(fragment), "Missing expected site feature: " + fragment);
 }
