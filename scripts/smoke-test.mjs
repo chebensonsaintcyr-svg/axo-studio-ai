@@ -30,6 +30,22 @@ report("HTML inline JavaScript syntax");
 // 2. Verify core UI features stay present and key IDs are not duplicated.
 for (const fragment of [
   'id="campaignForm"',
+  'id="authOpenBtn"',
+  'id="authDialog"',
+  'id="authForm"',
+  'id="authEmail"',
+  'id="authPassword"',
+  'id="authLogoutBtn"',
+  'id="authSetupNotice"',
+  'id="approveVoiceCheckbox"',
+  'src="auth-config.js"',
+  'src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"',
+  "window.AXO_AUTH_CONFIG",
+  "signInWithPassword",
+  "auth.signUp",
+  "resetPasswordForEmail",
+  "requireAuthSession",
+  "'Authorization':'Bearer ' + authSession.access_token",
   'id="exampleBtn"',
   'id="heroExampleBtn"',
   "ETAPA 1 · CAMPANHA",
@@ -175,9 +191,24 @@ const sampleCampaign = {
   ]
 };
 let upstreamCalls = 0;
+let authValidationCalls = 0;
 globalThis.fetch = async (url, options = {}) => {
-  upstreamCalls += 1;
   const address = String(url);
+  if (address.endsWith("/auth/v1/user")) {
+    authValidationCalls += 1;
+    const headers = options.headers || {};
+    const token = headers.Authorization || headers.authorization || "";
+    const apiKey = headers.apikey || "";
+    if (token === "Bearer valid-test-access-token-123" && apiKey === "supabase-publishable-test-key") {
+      return new Response(JSON.stringify({ id: "test-user-id", email: "test@example.com" }), {
+        status: 200, headers: { "Content-Type": "application/json" }
+      });
+    }
+    return new Response(JSON.stringify({ message: "Invalid JWT" }), {
+      status: 401, headers: { "Content-Type": "application/json" }
+    });
+  }
+  upstreamCalls += 1;
   if (address.includes("/v1beta/interactions")) {
     return new Response(JSON.stringify({
       steps: [{ type: "model_output", content: [{ type: "audio", data: Buffer.from("test-audio").toString("base64") }] }]
@@ -195,12 +226,17 @@ globalThis.fetch = async (url, options = {}) => {
 
 try {
   const origin = "https://chebensonsaintcyr-svg.github.io";
-  const env = { GEMINI_API_KEY: "unit-test-secret-only" };
+  const env = {
+    GEMINI_API_KEY: "unit-test-secret-only",
+    SUPABASE_URL: "https://supabase.test",
+    SUPABASE_ANON_KEY: "supabase-publishable-test-key",
+  };
   const campaignRequest = () => new Request("https://test-worker.local/", {
     method: "POST",
     headers: {
       "Origin": origin,
       "Content-Type": "application/json",
+      "Authorization": "Bearer valid-test-access-token-123",
       "CF-Connecting-IP": "198.51.100.10"
     },
     body: JSON.stringify({
@@ -244,6 +280,25 @@ try {
   assert.equal(invalidJsonShape.status, 400, "A JSON array should not be accepted as a request object.");
   report("Invalid JSON object shape rejected");
 
+  const invalidSessionResponse = await worker.fetch(new Request("https://test-worker.local/", {
+    method: "POST",
+    headers: {
+      "Origin": origin,
+      "Content-Type": "application/json",
+      "Authorization": "Bearer invalid-session-token-123",
+      "CF-Connecting-IP": "198.51.100.14"
+    },
+    body: JSON.stringify({ action: "speech", text: "Não autorizado" })
+  }), env);
+  assert.equal(invalidSessionResponse.status, 401, "Invalid sessions must be rejected before upstream AI calls.");
+  report("Invalid Supabase session rejected");
+
+  const missingAuthConfig = await worker.fetch(campaignRequest(), {
+    GEMINI_API_KEY: "unit-test-secret-only"
+  });
+  assert.equal(missingAuthConfig.status, 503, "Supabase configuration must be required to use AI endpoints.");
+  report("Missing Supabase configuration handled");
+
   const campaignResponse = await worker.fetch(campaignRequest(), env);
   assert.equal(campaignResponse.status, 200, "Campaign endpoint should respond successfully.");
   const campaignBody = await campaignResponse.json();
@@ -256,6 +311,7 @@ try {
     headers: {
       "Origin": origin,
       "Content-Type": "application/json",
+      "Authorization": "Bearer valid-test-access-token-123",
       "CF-Connecting-IP": "198.51.100.11"
     },
     body: JSON.stringify({ action: "speech", text: "Teste de narração", voice: "Kore", style: "Clear Brazilian Portuguese" })
@@ -271,6 +327,7 @@ try {
   report("Missing server secret handled without leaking details");
 
   assert.equal(upstreamCalls, 2, "Only campaign and speech requests should reach the mocked upstream.");
+  assert.equal(authValidationCalls, 3, "Protected requests with valid-shaped bodies should be validated by Supabase.");
 } finally {
   globalThis.fetch = previousFetch;
 }
