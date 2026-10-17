@@ -135,6 +135,9 @@ html[data-theme="light"] .theme-toolbar select:focus{outline-color:#555}
 .result-accordion[open] .accordion-mark{transform:rotate(45deg)}
 .accordion-body{padding:0 14px 14px;border-top:1px solid #26231c}
 .result-video-step{margin-top:20px;border:1px solid #4d3e21;border-radius:16px;padding:16px;background:linear-gradient(145deg,#15130e,#090909)}
+.voice-approval{display:flex;align-items:flex-start;gap:10px;margin-top:12px;padding:12px;border:1px solid #493a1d;border-radius:12px;background:#100e09;color:#e9e2d0;font-size:12px;line-height:1.5;cursor:pointer}
+.voice-approval input{accent-color:#d7b45a;flex:0 0 auto;width:17px;height:17px;margin:1px 0 0}
+.result-video-step .btn:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.3);box-shadow:none}
 .result-video-step .result-step-heading{margin-top:0}
 .history-details{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#0b0b0b}
 .history-details summary{font-size:13px;color:#f0efeb;font-weight:750}
@@ -482,9 +485,10 @@ function renderCampaign(d, c, fromHistory) {
     <button type="button" class="btn full guided-next" data-guided-target="#videoProductionSection">Continuar para vídeo →</button>
     <section class="result-video-step" id="videoProductionSection" aria-label="Etapa 3: gerar vídeo">
       <div class="result-step-heading"><span class="step-label">ETAPA 3 · VÍDEO</span><h3>Transforme o roteiro em vídeo</h3><p class="step-hint">Ouça a narração primeiro. Depois gere o vídeo com a mesma faixa de áudio.</p></div>
-    <div class="output-actions"><button type="button" class="btn secondary" id="previewVoiceBtn">🎧 Ouvir narração primeiro</button><button type="button" class="btn" id="videoBtn">🎬 Gerar vídeo vertical com voz</button><button type="button" class="btn secondary" id="copyBtn">Copiar campanha</button><button type="button" class="btn secondary" id="downloadBtn">Baixar .txt</button><button type="button" class="btn secondary" id="whatsappBtn">Compartilhar no WhatsApp</button></div>
+    <div class="output-actions"><button type="button" class="btn secondary" id="previewVoiceBtn">🎧 Ouvir narração primeiro</button><button type="button" class="btn" id="videoBtn" disabled aria-describedby="voicePreviewStatus">🔒 Ouça e aprove a narração para continuar</button><button type="button" class="btn secondary" id="copyBtn">Copiar campanha</button><button type="button" class="btn secondary" id="downloadBtn">Baixar .txt</button><button type="button" class="btn secondary" id="whatsappBtn">Compartilhar no WhatsApp</button></div>
     <audio id="voicePreviewPlayer" controls preload="none" style="display:none;width:100%;margin-top:12px"></audio>
-    <p class="tiny" id="voicePreviewStatus">Teste a narração antes de gerar o vídeo. O vídeo usará exatamente o áudio aprovado aqui.</p>
+    <label class="voice-approval" for="approveVoiceCheckbox"><input id="approveVoiceCheckbox" type="checkbox" disabled><span>Ouvi a narração e aprovo exatamente esta faixa de áudio para usar no vídeo.</span></label>
+    <p class="tiny" id="voicePreviewStatus">Primeiro gere e escute a narração. O vídeo só será liberado depois da sua aprovação.</p>
     </section>` +
     '<p class="notice">O vídeo usa uma única narração por IA e a identidade visual AXO. Confira as licenças e atribuições no painel antes de usar imagens em anúncios comerciais.</p>';
 
@@ -811,6 +815,17 @@ function renderCampaign(d, c, fromHistory) {
   const previewPlayer = $('voicePreviewPlayer');
   const previewStatus = $('voicePreviewStatus');
   const previewButton = $('previewVoiceBtn');
+  const approveVoiceCheckbox = $('approveVoiceCheckbox');
+  const videoButton = $('videoBtn');
+
+  approveVoiceCheckbox.addEventListener('change', function () {
+    const approved = Boolean(this.checked && preparedAudioBase64);
+    videoButton.disabled = !approved;
+    videoButton.textContent = approved ? '🎬 Gerar vídeo vertical com voz' : '🔒 Ouça e aprove a narração para continuar';
+    previewStatus.textContent = approved
+      ? '✓ Narração aprovada. O vídeo usará exatamente esta faixa de áudio, sem gerar uma segunda voz.'
+      : 'Escute a narração e marque a confirmação para liberar o vídeo.';
+  });
 
   async function prepareAndPreviewVoice() {
     if (preparedAudioBase64) {
@@ -849,13 +864,21 @@ function renderCampaign(d, c, fromHistory) {
       previewPlayer.src = previewObjectUrl;
       previewPlayer.style.display = 'block';
       previewPlayer.load();
-      previewStatus.textContent = 'Ouça aqui. O vídeo usará exatamente esta faixa, sem gerar uma segunda voz.';
+      approveVoiceCheckbox.checked = false;
+      approveVoiceCheckbox.disabled = false;
+      videoButton.disabled = true;
+      videoButton.textContent = '🔒 Ouça e aprove a narração para continuar';
+      previewStatus.textContent = 'Ouça a faixa abaixo. Depois marque a confirmação para liberar o vídeo.';
       previewPlayer.play().catch(function () {
         previewStatus.textContent = 'Narração pronta. Toque em reproduzir no player para ouvir.';
       });
       previewButton.textContent = '↻ Ouvir de novo';
     } catch (err) {
       preparedAudioBase64 = '';
+      approveVoiceCheckbox.checked = false;
+      approveVoiceCheckbox.disabled = true;
+      videoButton.disabled = true;
+      videoButton.textContent = '🔒 Ouça e aprove a narração para continuar';
       previewStatus.textContent = 'Não foi possível preparar a narração.';
       showError(err && err.message ? err.message : 'Não foi possível gerar a narração. Tente novamente.');
       previewButton.textContent = originalLabel;
@@ -867,6 +890,10 @@ function renderCampaign(d, c, fromHistory) {
   previewButton.addEventListener('click', prepareAndPreviewVoice);
 
   $('videoBtn').addEventListener('click', function () {
+    if (!preparedAudioBase64 || !approveVoiceCheckbox.checked) {
+      previewStatus.textContent = 'Gere e escute a narração, depois confirme a aprovação antes de criar o vídeo.';
+      return;
+    }
     const files = localImageInput ? Array.from(localImageInput.files || []).filter(function (file) {
       return file.type && file.type.startsWith('image/');
     }).slice(0, 4) : [];
