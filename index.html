@@ -356,6 +356,26 @@ function setAuthFeedback(message, isError) {
   authFeedback.textContent = message || '';
   authFeedback.classList.toggle('error', Boolean(isError));
 }
+function friendlyAuthError(error, mode) {
+  const message = String(error && error.message || '').trim();
+  const code = String(error && (error.code || error.error_code) || '').toLowerCase();
+  if (code === 'over_email_send_rate_limit' || /email rate limit exceeded|over_email_send_rate_limit/i.test(message)) {
+    return 'O envio padrão do Supabase está limitado a 2 e-mails por hora. Para liberar confirmações e recuperação em escala, configure um SMTP próprio em Supabase → Authentication → Emails → SMTP Settings. Não compartilhe a senha SMTP no chat nem no repositório.';
+  }
+  if (/for security purposes, you can only request this after/i.test(message)) {
+    return 'Por segurança, aguarde o intervalo indicado pelo Supabase antes de solicitar outro e-mail.';
+  }
+  if (/invalid login credentials|invalid_credentials/i.test(message)) {
+    return 'E-mail ou senha incorretos. Confira os dados e tente novamente.';
+  }
+  if (/user already registered|already registered/i.test(message)) {
+    return 'Este e-mail já possui uma conta. Tente entrar ou use a recuperação de senha.';
+  }
+  if (/weak_password|password should be at least/i.test(message)) {
+    return 'Escolha uma senha mais forte com pelo menos 8 caracteres.';
+  }
+  return message || 'Não foi possível concluir o acesso. Tente novamente.';
+}
 function setAuthMode(mode) {
   currentAuthMode = ['signin','signup','recover','newpassword'].includes(mode) ? mode : 'signin';
   const isRecover = currentAuthMode === 'recover';
@@ -471,7 +491,7 @@ $('authForm').addEventListener('submit', async function (event) {
       setAuthFeedback('Login realizado com sucesso.');
     }
   } catch (err) {
-    setAuthFeedback(err && err.message ? err.message : 'Não foi possível concluir o acesso.', true);
+    setAuthFeedback(friendlyAuthError(err, currentAuthMode), true);
   } finally {
     button.disabled = false;
   }
