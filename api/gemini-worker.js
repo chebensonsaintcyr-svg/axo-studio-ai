@@ -4,14 +4,15 @@
  * IMPORTANTE:
  * - Configure GEMINI_API_KEY como Secret no painel Cloudflare Workers.
  * - Nunca coloque a chave no HTML, JavaScript público ou GitHub.
- * - O limite por IP deste arquivo é apenas uma proteção básica em memória.
- *   Antes de abrir o serviço ao público, adicione Cloudflare Turnstile e/ou
- *   limitação persistente de requisições.
+ * - Há limites básicos em memória e tamanho máximo de requisição.
+ * - Para proteção consistente entre instâncias, configure Cloudflare Rate Limiting
+ *   e Turnstile no painel antes de escalar o serviço.
  */
 
 const ALLOWED_ORIGIN = "https://chebensonsaintcyr-svg.github.io";
 const MODEL = "gemini-3.8-flash";
-const MAX_REQUESTS_PER_MINUTE = 8;
+const MAX_REQUESTS_PER_MINUTE = 5;
+const MAX_REQUEST_BODY_BYTES = 12_000;
 const ipBuckets = new Map();
 
 function corsHeaders(origin) {
@@ -83,6 +84,16 @@ export default {
       return jsonResponse({ error: "A chave de IA ainda não foi configurada no servidor." }, 503, origin);
     }
 
+    const contentType = request.headers.get("Content-Type") || "";
+    if (!contentType.toLowerCase().includes("application/json")) {
+      return jsonResponse({ error: "Envie o pedido no formato JSON." }, 415, origin);
+    }
+
+    const declaredLength = Number(request.headers.get("Content-Length") || "0");
+    if (Number.isFinite(declaredLength) && declaredLength > MAX_REQUEST_BODY_BYTES) {
+      return jsonResponse({ error: "O pedido é muito grande. Reduza o texto e tente novamente." }, 413, origin);
+    }
+
     const ip = request.headers.get("CF-Connecting-IP") || "unknown";
     if (rateLimited(ip)) {
       return jsonResponse({ error: "Muitas tentativas. Aguarde um minuto e tente novamente." }, 429, origin);
@@ -90,13 +101,21 @@ export default {
 
     let input;
     try {
-      input = await request.json();
+      const rawBody = await request.text();
+      if (new TextEncoder().encode(rawBody).byteLength > MAX_REQUEST_BODY_BYTES) {
+        return jsonResponse({ error: "O pedido é muito grande. Reduza o texto e tente novamente." }, 413, origin);
+      }
+      input = JSON.parse(rawBody);
     } catch {
-      return jsonResponse({ error: "O pedido precisa estar em formato JSON." }, 400, origin);
+      return jsonResponse({ error: "O pedido precisa estar em formato JSON válido." }, 400, origin);
+    }
+
+    if (!input || typeof input !== "object" || Array.isArray(input)) {
+      return jsonResponse({ error: "O pedido precisa conter um objeto JSON." }, 400, origin);
     }
 
     if (input.action === "speech") {
-      const speechText = cleanString(input.text, 1800);
+      const speechText = cleanString(input.text, 1200);
       const requestedVoice = cleanString(input.voice, 32);
       const allowedVoices = new Set(["Kore", "Puck", "Charon", "Fenrir", "Aoede", "Leda", "Orus", "Zephyr"]);
       const voice = allowedVoices.has(requestedVoice) ? requestedVoice : "Kore";
@@ -211,7 +230,7 @@ Escreva para uma empresa real local. Evite a palavra "joven" se não estiver cor
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
-            maxOutputTokens: 3000,
+            maxOutputTokens: 1800,
             responseMimeType: "application/json",
             responseSchema: {
               type: "OBJECT",
