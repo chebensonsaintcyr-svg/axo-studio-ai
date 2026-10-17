@@ -87,6 +87,23 @@ html[data-theme="light"] .theme-toolbar select{border-color:#ccccca;background:#
 html[data-theme="light"] .theme-toolbar select:focus{outline-color:#555}
 
 @media(max-width:800px){.hero{grid-template-columns:1fr;padding-top:48px;gap:32px}.features,.steps{grid-template-columns:1fr}.generatorgrid{grid-template-columns:1fr}.navlinks a:not(.navcta){display:none}.navlinks{gap:10px}.brand-image{width:124px;height:54px}.mockvideo{min-height:230px}.wrap{padding:0 17px}.section{padding:48px 0}h1{letter-spacing:-1.8px}}
+
+/* AXO Creative Kit — unified production controls */
+.studio-kit{margin-top:22px;border:1px solid #5b4a27;border-radius:18px;padding:18px;background:linear-gradient(145deg,#13120f,#090909)}
+.studio-kit h3{margin:0 0 7px;color:#f6f3eb}
+.studio-kit .kit-lead{color:var(--muted);font-size:13px;margin:0 0 15px}
+.kit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.kit-field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+.kit-field select{width:100%;min-height:42px;padding:10px;border-radius:10px;border:1px solid var(--line);background:#0b0b0b;color:var(--text)}
+.kit-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.kit-output{margin-top:16px}
+.kit-card{border:1px solid var(--line);border-radius:12px;padding:13px;margin-top:10px;background:#0b0b0b}
+.kit-card h4{margin:0 0 7px;color:#d7b45a}
+.kit-card p{white-space:pre-wrap;overflow-wrap:anywhere;color:#e7e7e7;font-size:13px;margin:0 0 9px}
+.kit-card button{font-size:12px;padding:8px 11px}
+.kit-note{font-size:11px;color:var(--muted);margin-top:10px}
+@media(max-width:600px){.kit-grid{grid-template-columns:1fr}.studio-kit{padding:14px}}
+
 </style>
 </head>
 <body>
@@ -344,7 +361,44 @@ function renderCampaign(d, c, fromHistory) {
     '<h4>Legenda do anúncio</h4><p>' + esc(c.caption) + '</p>' +
     '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px">' + hashtags + '</div>' +
     '<h4>Plano de cenas</h4>' + scenes +
-    `<div class="feature" style="margin-top:18px">
+    `<section class="studio-kit" aria-labelledby="studioKitTitle">
+      <h3 id="studioKitTitle">Estúdio criativo AXO</h3>
+      <p class="kit-lead">Escolha a direção visual, o clima musical e o formato. O AXO monta prompts e um plano de produção prontos para usar nas suas ferramentas criativas.</p>
+      <div class="kit-grid">
+        <div class="kit-field"><label for="creativeLook">Direção visual</label><select id="creativeLook">
+          <option value="cinematic">Cinematográfico premium</option>
+          <option value="clean">Minimalista e elegante</option>
+          <option value="ugc">Natural estilo UGC</option>
+          <option value="editorial">Editorial publicitário</option>
+        </select></div>
+        <div class="kit-field"><label for="creativeMood">Clima da música</label><select id="creativeMood">
+          <option value="elegant">Elegante e sofisticado</option>
+          <option value="energetic">Energético e moderno</option>
+          <option value="warm">Leve e acolhedor</option>
+          <option value="inspiring">Inspirador e emocional</option>
+          <option value="tech">Tecnológico e futurista</option>
+        </select></div>
+        <div class="kit-field"><label for="creativeTempo">Ritmo musical</label><select id="creativeTempo">
+          <option value="slow">Lento · 70–90 BPM</option>
+          <option value="medium" selected>Médio · 90–115 BPM</option>
+          <option value="fast">Rápido · 115–140 BPM</option>
+        </select></div>
+        <div class="kit-field"><label for="creativeRatio">Formato dos visuais</label><select id="creativeRatio">
+          <option value="9:16" selected>Vertical · 9:16 (Reels/TikTok)</option>
+          <option value="4:5">Feed · 4:5</option>
+          <option value="1:1">Quadrado · 1:1</option>
+          <option value="16:9">Horizontal · 16:9</option>
+        </select></div>
+      </div>
+      <div class="kit-actions">
+        <button type="button" class="btn" id="buildProductionKitBtn">✦ Montar kit de produção</button>
+        <button type="button" class="btn secondary" id="copyProductionKitBtn" style="display:none">Copiar kit completo</button>
+        <button type="button" class="btn secondary" id="downloadProductionKitBtn" style="display:none">Baixar kit .txt</button>
+      </div>
+      <div id="productionKitOutput" class="kit-output" aria-live="polite"></div>
+      <p class="kit-note">Este kit cria instruções e prompts — não gera automaticamente música ou imagens e não chama a IA do AXO. Você pode levar os prompts para sua ferramenta criativa preferida.</p>
+    </section>
+    <div class="feature" style="margin-top:18px">
       <h3 style="margin-top:0">Imagens gratuitas para seu vídeo</h3>
       <p class="tiny">A AXO procura imagens no Wikimedia Commons. Confira o autor, a licença e a página da imagem antes de usar em anúncios comerciais.</p>
       <div class="field"><label for="commonsQuery">O que devemos procurar?</label><input id="commonsQuery" maxlength="140" value="${esc(d.product)}" placeholder="Ex.: motorcycle mechanic"></div>
@@ -363,6 +417,117 @@ function renderCampaign(d, c, fromHistory) {
   $('empty').classList.add('hidden');
   $('results').classList.remove('hidden');
   if (!fromHistory) saveCampaignHistory(d, c);
+
+  let productionKitParts = [];
+  let productionKitText = '';
+
+  function copyTextToClipboard(value) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(value).catch(function () { fallbackCopyText(value); });
+    }
+    fallbackCopyText(value);
+    return Promise.resolve();
+  }
+
+  function fallbackCopyText(value) {
+    const area = document.createElement('textarea');
+    area.value = value;
+    area.style.position = 'fixed';
+    area.style.opacity = '0';
+    document.body.appendChild(area);
+    area.select();
+    try { document.execCommand('copy'); } catch (err) {}
+    area.remove();
+  }
+
+  $('buildProductionKitBtn').addEventListener('click', function () {
+    const looks = {
+      cinematic: 'Luz cinematográfica suave, contraste elegante, textura realista, profundidade de campo controlada, movimentos de câmera estáveis e cortes intencionais.',
+      clean: 'Composição minimalista, espaço negativo, luz limpa, linhas simples, enquadramento organizado e poucos elementos por cena.',
+      ugc: 'Aparência natural e autêntica, enquadramento próximo, sensação de bastidores, movimentos leves de câmera e luz ambiente realista.',
+      editorial: 'Fotografia publicitária editorial, composição sofisticada, atenção a materiais e detalhes, luz cuidadosamente posicionada e acabamento profissional.'
+    };
+    const moods = {
+      elegant: 'Clima elegante e sofisticado; piano suave, pads quentes e textura discreta, sem competir com a narração.',
+      energetic: 'Clima energético e moderno; percussão leve e firme, baixo limpo e sintetizadores ritmados, sem ficar agressivo.',
+      warm: 'Clima leve e acolhedor; violão ou piano macio, timbres orgânicos e sensação confortável.',
+      inspiring: 'Clima inspirador e emocional; evolução gradual, acordes luminosos e crescimento moderado para o final.',
+      tech: 'Clima tecnológico e futurista; pulsos eletrônicos limpos, sintetizadores sutis e textura moderna, sem efeitos exagerados.'
+    };
+    const tempos = {
+      slow: '70–90 BPM, andamento lento e espaços para respirar',
+      medium: '90–115 BPM, andamento médio e constante',
+      fast: '115–140 BPM, andamento rápido e cortes mais dinâmicos'
+    };
+    const ratio = $('creativeRatio').value;
+    const look = looks[$('creativeLook').value] || looks.cinematic;
+    const mood = moods[$('creativeMood').value] || moods.elegant;
+    const tempo = tempos[$('creativeTempo').value] || tempos.medium;
+    const scenesList = Array.isArray(c.scenes) ? c.scenes : [];
+    const visualPrompts = scenesList.map(function (scene, index) {
+      const description = String(scene.description || c.script || '').trim();
+      const visual = String(scene.visual || d.product || '').trim();
+      const prompt = 'Crie uma cena publicitária para ' + d.business + ', promovendo ' + d.product + '. ' +
+        'Cena ' + (index + 1) + ': ' + visual + '. A mensagem da cena é: ' + description + '. ' +
+        look + ' Público: ' + d.audience + '. Formato ' + ratio + '. ' +
+        'Mantenha o produto como foco. Sem texto escrito na imagem, sem logotipos inventados, sem marcas de terceiros, sem flicker, sem objetos se transformando e sem câmera tremida.';
+      return {title:'Prompt visual · Cena ' + (index + 1) + ' · ' + (scene.label || 'Cena'), content:prompt};
+    });
+    const musicPrompt = 'Trilha instrumental original para uma campanha de ' + d.business + ' que promove ' + d.product + '. ' +
+      mood + ' ' + tempo + '. Duração sugerida: 15–20 segundos; introdução curta, desenvolvimento consistente e final limpo para a chamada à ação. ' +
+      'Sem voz, sem diálogo, sem imitar músicas ou artistas existentes e sem melodias reconhecíveis. A narração ficará em uma faixa separada.';
+    const soundPrompt = scenesList.map(function (scene, index) {
+      const cue = index === 0
+        ? 'Acento sonoro discreto no gancho, com início limpo e sem impacto alto.'
+        : index === scenesList.length - 1
+          ? 'Pequeno acento no convite à ação e saída gradual do som.'
+          : 'Som ambiente muito baixo relacionado ao produto, sem competir com a voz.';
+      return String(scene.time || ('Cena ' + (index + 1))) + ' — ' + (scene.visual || scene.description || 'visual principal') + '\nDireção de som: ' + cue;
+    }).join('\n\n');
+    const voicePrompt = 'Uma única voz principal em português brasileiro, natural e articulada, ritmo médio e volume constante. Sem coro, sem voz duplicada, sem eco, sem fala sobreposta. Deixar a música baixa e a narração claramente à frente.';
+    productionKitParts = [
+      {title:'Direção criativa',content:'Marca: ' + d.business + '\nProduto: ' + d.product + '\nPúblico: ' + d.audience + '\nObjetivo: ' + d.goal + '\nFormato: ' + ratio + '\nDireção visual: ' + look},
+      ...visualPrompts,
+      {title:'Prompt de trilha musical',content:musicPrompt},
+      {title:'Plano de efeitos sonoros',content:soundPrompt},
+      {title:'Direção de voz',content:voicePrompt},
+      {title:'Prompt negativo / evitar',content:'Evitar texto ilegível, marcas ou logotipos inventados, cintilação, rostos ou mãos deformados, objetos que mudam de forma entre quadros, câmera instável, cortes aleatórios, música alta demais e vozes duplicadas.'}
+    ];
+    productionKitText = productionKitParts.map(function (part) { return part.title.toUpperCase() + '\n' + part.content; }).join('\n\n' + '='.repeat(36) + '\n\n');
+    $('productionKitOutput').innerHTML = productionKitParts.map(function (part, index) {
+      return '<div class="kit-card"><h4>' + esc(part.title) + '</h4><p>' + esc(part.content) +
+        '</p><button type="button" class="btn secondary" data-kit-part="' + index + '">Copiar esta parte</button></div>';
+    }).join('');
+    $('copyProductionKitBtn').style.display = 'inline-flex';
+    $('downloadProductionKitBtn').style.display = 'inline-flex';
+    $('productionKitOutput').querySelectorAll('[data-kit-part]').forEach(function (button) {
+      button.addEventListener('click', async function () {
+        const index = Number(button.dataset.kitPart);
+        const part = productionKitParts[index];
+        if (!part) return;
+        await copyTextToClipboard(part.content);
+        const old = button.textContent;
+        button.textContent = '✓ Copiado';
+        setTimeout(function () { button.textContent = old; }, 1500);
+      });
+    });
+    $('copyProductionKitBtn').onclick = async function () {
+      await copyTextToClipboard(productionKitText);
+      $('copyProductionKitBtn').textContent = '✓ Kit copiado';
+      setTimeout(function () { $('copyProductionKitBtn').textContent = 'Copiar kit completo'; }, 1500);
+    };
+    $('downloadProductionKitBtn').onclick = function () {
+      const blob = new Blob([productionKitText], {type:'text/plain;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'axo-kit-producao.txt';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 30000);
+    };
+  });
 
   $('copyBtn').addEventListener('click', async function () {
     const text = toCampaignText(d, c);
