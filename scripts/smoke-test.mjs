@@ -38,6 +38,11 @@ for (const fragment of [
   "https://commons.wikimedia.org/w/api.php",
   "function generateVideo",
   "new MediaRecorder(combinedStream",
+  "canvas.captureStream(24)",
+  "const frameCache = new Map()",
+  "const frameInterval = 1000 / 24",
+  "rgba(215,180,90,0.055)",
+  "drawVideoFrame(ctx, d, c, elapsed, videoDuration, visualBitmaps, creditLine, frameCache)",
   "searchCommonsImages(d.product, true)",
   "function buildCommonsCredit",
   "id=\"historyList\"",
@@ -73,7 +78,10 @@ assert.equal((html.match(/<script\b/gi) || []).length, (html.match(/<\/script>/g
 assert.ok(!/AQ\.[A-Za-z0-9_-]{20,}/.test(html), "Possible API key leaked into public HTML.");
 assert.equal((html.match(/class="feature faq-item"/g) || []).length, 6,
   "The FAQ section should contain six transparent answers.");
+assert.ok(!html.includes("rgba(139,92,246,0)"), "Video renderer should not use the previous purple glow style.");
+assert.ok(!html.includes("rgba(196,181,253,0.16)"), "Video renderer should not use the previous decorative purple rings.");
 report("Critical features, unique IDs, balanced script tags, and no exposed API-key pattern");
+report("Video renderer uses cached scenes, a 24 fps cap, and AXO gold styling");
 
 assert.ok(robotsSource.includes("User-agent: *"), "robots.txt should include the general crawler rule.");
 assert.ok(robotsSource.includes("Sitemap: https://chebensonsaintcyr-svg.github.io/axo-studio-ai/sitemap.xml"),
