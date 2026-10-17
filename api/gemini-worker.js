@@ -19,7 +19,7 @@ function corsHeaders(origin) {
   return {
     "Access-Control-Allow-Origin": origin === ALLOWED_ORIGIN ? ALLOWED_ORIGIN : "null",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
     "Access-Control-Max-Age": "86400",
     "Vary": "Origin",
   };
@@ -59,6 +59,41 @@ function rateLimited(ip) {
 
 function cleanString(value, maxLength) {
   return typeof value === "string" ? value.trim().slice(0, maxLength) : "";
+}
+
+async function verifySupabaseSession(request, env) {
+  const supabaseUrl = cleanString(env.SUPABASE_URL, 300).replace(/\\/+$/, "");
+  const publishableKey = cleanString(env.SUPABASE_ANON_KEY, 300);
+  if (!supabaseUrl || !publishableKey) {
+    return { ok: false, status: 503, error: "O login ainda não foi configurado no servidor." };
+  }
+
+  const authorization = request.headers.get("Authorization") || "";
+  const match = authorization.match(/^Bearer\\s+([^\\s]{16,4096})$/i);
+  if (!match) {
+    return { ok: false, status: 401, error: "Entre na sua conta AXO para usar este recurso." };
+  }
+
+  try {
+    const response = await fetch(supabaseUrl + "/auth/v1/user", {
+      method: "GET",
+      headers: {
+        "apikey": publishableKey,
+        "Authorization": "Bearer " + match[1],
+        "Accept": "application/json",
+      },
+    });
+    if (!response.ok) {
+      return { ok: false, status: 401, error: "Sua sessão expirou ou não é válida. Entre novamente." };
+    }
+    const user = await response.json();
+    if (!user || typeof user.id !== "string" || !user.id) {
+      return { ok: false, status: 401, error: "Não foi possível validar sua conta. Entre novamente." };
+    }
+    return { ok: true, userId: user.id };
+  } catch {
+    return { ok: false, status: 502, error: "Não foi possível validar o login agora. Tente novamente." };
+  }
 }
 
 export default {
@@ -112,6 +147,11 @@ export default {
 
     if (!input || typeof input !== "object" || Array.isArray(input)) {
       return jsonResponse({ error: "O pedido precisa conter um objeto JSON." }, 400, origin);
+    }
+
+    const auth = await verifySupabaseSession(request, env);
+    if (!auth.ok) {
+      return jsonResponse({ error: auth.error }, auth.status, origin);
     }
 
     if (input.action === "speech") {
