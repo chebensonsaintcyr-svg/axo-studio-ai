@@ -67,4 +67,4 @@ O limite por usuário entre solicitações sucessivas também existe; se o Supab
 - Proteção da API de campanhas e narração por token validado no servidor.
 - A tela de exemplo fica disponível sem conta; chamadas reais de IA exigem login.
 
-As campanhas recentes ainda ficam no armazenamento local daquele navegador; ainda não são sincronizadas entre dispositivos/contas.
+As campanhas recentes e a preferência de tema ficam no armazenamento local do navegador, usando chaves separadas por ID de usuário autenticado (ou uma área de visitante). Isso evita que o AXO misture o histórico e o tema de contas diferentes na interface do mesmo navegador. Esses dados ainda não são sincronizados com a nuvem e não são protegidos por políticas RLS no banco, porque ainda não são guardados numa tabela Supabase. Para sincronizar entre dispositivos e ter isolamento validado pelo servidor, será necessário criar uma tabela própria com Row Level Security (RLS).
