@@ -37,6 +37,8 @@ for (const fragment of [
   'id="authEmail"',
   'id="authPassword"',
   'id="authLogoutBtn"',
+  'id="authContinueBtn"',
+  'id="axoToast"',
   'id="authSetupNotice"',
   'id="approveVoiceCheckbox"',
   'src="auth-config.js"',
@@ -76,6 +78,12 @@ for (const fragment of [
   'class="history-details"',
   "Ver campanhas salvas",
   "const THEME_STORAGE_KEY = 'axoStudioThemeV2'",
+  "const HISTORY_STORAGE_KEY = 'axoStudioCampaignHistoryV1'",
+  "function scopedStorageKey",
+  "function readSavedThemeForScope",
+  "function closeAuthDialog",
+  "showAccountToast('Acesso confirmado. Bem-vindo ao AXO.')",
+  "activeAccountScope = nextScope",
   'option value="gold">Preto e dourado',
   "html[data-theme=\"gold\"] .btn:not(.secondary)",
   "function showExampleCampaign",
@@ -118,7 +126,8 @@ for (const fragment of [
   "function getCampaignHistory",
   "function saveCampaignHistory",
   "function renderHistory",
-  "localStorage.setItem(HISTORY_STORAGE_KEY",
+  "localStorage.setItem(scopedStorageKey(HISTORY_STORAGE_KEY)",
+  "localStorage.getItem(scopedStorageKey(HISTORY_STORAGE_KEY))",
   'id="themeSelect"',
   "function applyTheme",
   "localStorage.setItem(THEME_STORAGE_KEY",
@@ -146,6 +155,8 @@ assert.equal((html.match(/<script\b/gi) || []).length, (html.match(/<\/script>/g
   "Script opening and closing tags must match.");
 assert.ok(!/AQ\.[A-Za-z0-9_-]{20,}/.test(html), "Possible API key leaked into public HTML.");
 assert.ok(!html.includes("window.location.href.split('#')[0]"), "Auth email links must not return to localhost or a temporary preview origin.");
+assert.ok(!/localStorage\.(?:getItem|setItem)\(HISTORY_STORAGE_KEY/.test(html),
+  "Campaign history must never use a shared unscoped browser-storage key.");
 assert.equal((html.match(/class="feature faq-item"/g) || []).length, 6,
   "The FAQ section should contain six transparent answers.");
 assert.ok(!html.includes("rgba(139,92,246,0)"), "Video renderer should not use the previous purple glow style.");
