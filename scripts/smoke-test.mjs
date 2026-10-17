@@ -44,7 +44,8 @@ for (const fragment of [
   'value="light"',
   "document.documentElement.dataset.theme",
   'id="whatsappBtn"',
-  "const whatsappUrl = 'https://wa.me/?text=' + encodeURIComponent(campaignText)"
+  "const whatsappUrl = 'https://wa.me/?text=' + encodeURIComponent(campaignText)",
+  'html[data-theme="light"] .output p{color:#333}'
 ]) {
   assert.ok(html.includes(fragment), "Missing expected site feature: " + fragment);
 }
