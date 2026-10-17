@@ -42,6 +42,20 @@ O Worker valida cada token de acesso consultando o endpoint `/auth/v1/user` do S
 3. Abra o site e teste criar conta, confirmar e-mail, entrar, sair e recuperar senha.
 4. Confirme que a API responde **401** quando um pedido não contém um token válido e que a geração funciona depois do login.
 
+## Se só chegam 2 e-mails por hora
+
+Isso não significa que o AXO só aceita duas contas. O serviço de e-mail padrão do Supabase tem um limite global de **2 mensagens por hora** para confirmações, recuperação de senha e outros e-mails de autenticação. Alterar o código do site não aumenta essa cota.
+
+Para permitir mais cadastros:
+
+1. Escolha um serviço de e-mail transacional que ofereça SMTP.
+2. Verifique o domínio/remetente no provedor e publique os registros DNS que ele solicitar (por exemplo, SPF e DKIM).
+3. No Supabase, abra **Authentication → Emails → SMTP Settings**, habilite o SMTP personalizado e preencha host, porta, usuário, senha e remetente.
+4. Guarde as credenciais apenas no painel de configurações do Supabase — **nunca no HTML, no GitHub, em capturas de tela ou neste chat**.
+5. Envie um teste de confirmação e outro de recuperação de senha. Só depois ajuste **Authentication → Rate Limits** para um volume compatível com o serviço escolhido e com o estágio do AXO.
+
+O limite por usuário entre solicitações sucessivas também existe; se o Supabase pedir para aguardar alguns segundos, espere o intervalo exibido antes de solicitar outro link. Não fique tentando repetidamente, pois isso pode consumir a cota.
+
 ## O que está incluso
 
 - Cadastro com e-mail e senha.
