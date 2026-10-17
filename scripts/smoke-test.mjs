@@ -42,7 +42,9 @@ for (const fragment of [
   'value="silver"',
   'value="purple"',
   'value="light"',
-  "document.documentElement.dataset.theme"
+  "document.documentElement.dataset.theme",
+  'id="whatsappBtn"',
+  "const whatsappUrl = 'https://wa.me/?text=' + encodeURIComponent(campaignText)"
 ]) {
   assert.ok(html.includes(fragment), "Missing expected site feature: " + fragment);
 }
