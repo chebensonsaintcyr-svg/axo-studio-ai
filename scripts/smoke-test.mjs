@@ -42,6 +42,9 @@ for (const fragment of [
   'src="auth-config.js"',
   'src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"',
   "window.AXO_AUTH_CONFIG",
+  "const AXO_PUBLIC_URL = 'https://chebensonsaintcyr-svg.github.io/axo-studio-ai/'",
+  "emailRedirectTo: AXO_PUBLIC_URL",
+  "redirectTo: AXO_PUBLIC_URL",
   "signInWithPassword",
   "function friendlyAuthError",
   "2 e-mails por hora",
@@ -142,6 +145,7 @@ assert.deepEqual([...new Set(duplicatedIds)], [], "HTML contains duplicate IDs."
 assert.equal((html.match(/<script\b/gi) || []).length, (html.match(/<\/script>/gi) || []).length,
   "Script opening and closing tags must match.");
 assert.ok(!/AQ\.[A-Za-z0-9_-]{20,}/.test(html), "Possible API key leaked into public HTML.");
+assert.ok(!html.includes("window.location.href.split('#')[0]"), "Auth email links must not return to localhost or a temporary preview origin.");
 assert.equal((html.match(/class="feature faq-item"/g) || []).length, 6,
   "The FAQ section should contain six transparent answers.");
 assert.ok(!html.includes("rgba(139,92,246,0)"), "Video renderer should not use the previous purple glow style.");

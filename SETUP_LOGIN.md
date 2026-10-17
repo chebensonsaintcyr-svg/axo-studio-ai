@@ -25,6 +25,8 @@ window.AXO_AUTH_CONFIG = Object.freeze({
 
 A Publishable/anon key foi feita para uso no browser. Mesmo assim, políticas RLS são necessárias para qualquer tabela de dados que venha a ser adicionada. **Nunca use a chave `service_role`, senha do banco ou outra chave secreta no arquivo público.**
 
+Importante: o link de confirmação e o link de recuperação devem voltar para o site público do AXO, não para `localhost:3000` nem para o endereço temporário do ambiente de desenvolvimento. O código usa como retorno fixo `https://chebensonsaintcyr-svg.github.io/axo-studio-ai/`. Em **Authentication → URL Configuration**, confirme que esse endereço está definido como **Site URL** e incluído em **Redirect URLs**.
+
 ## 3. Proteger a API do Cloudflare Worker
 
 No Cloudflare Dashboard, abra o Worker `axo-studio-ai-api` → **Settings → Variables and Secrets**. Configure:
