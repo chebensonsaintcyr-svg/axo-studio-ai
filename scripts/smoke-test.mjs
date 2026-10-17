@@ -51,7 +51,11 @@ for (const fragment of [
   'html[data-theme="light"] .output p{color:#333}',
   'rel="canonical"',
   'property="og:title"',
-  '"@type": "WebSite"'
+  '"@type": "WebSite"',
+  'id="perguntas"',
+  'class="feature faq-item"',
+  'A AXO publica anúncios no Facebook ou Instagram?',
+  'A AXO garante vendas ou clientes?'
 ]) {
   assert.ok(html.includes(fragment), "Missing expected site feature: " + fragment);
 }
@@ -61,6 +65,8 @@ assert.deepEqual([...new Set(duplicatedIds)], [], "HTML contains duplicate IDs."
 assert.equal((html.match(/<script\b/gi) || []).length, (html.match(/<\/script>/gi) || []).length,
   "Script opening and closing tags must match.");
 assert.ok(!/AQ\.[A-Za-z0-9_-]{20,}/.test(html), "Possible API key leaked into public HTML.");
+assert.equal((html.match(/class="feature faq-item"/g) || []).length, 6,
+  "The FAQ section should contain six transparent answers.");
 report("Critical features, unique IDs, balanced script tags, and no exposed API-key pattern");
 
 assert.ok(robotsSource.includes("User-agent: *"), "robots.txt should include the general crawler rule.");
