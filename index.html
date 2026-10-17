@@ -588,7 +588,7 @@ function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
   return visible.length;
 }
 
-function drawVideoFrame(ctx, d, c, elapsed, duration, images, creditLine) {
+function drawVideoFrame(ctx, d, c, elapsed, duration, images, creditLine, frameCache) {
   const w = ctx.canvas.width, h = ctx.canvas.height;
   const progress = Math.min(1, elapsed / duration);
   const sceneList = Array.isArray(c.scenes) && c.scenes.length ? c.scenes : [
@@ -598,100 +598,116 @@ function drawVideoFrame(ctx, d, c, elapsed, duration, images, creditLine) {
   ];
   const index = Math.min(sceneList.length - 1, Math.floor(progress * sceneList.length));
   const scene = sceneList[index];
+  const imageIndex = images && images.length
+    ? Math.min(images.length - 1, Math.floor(progress * images.length))
+    : -1;
+  const cacheKey = index + ':' + imageIndex;
+  let layer = frameCache && frameCache.get(cacheKey);
 
-  if (images && images.length) {
-    const image = images[Math.min(images.length - 1, Math.floor(progress * images.length))];
-    const scale = Math.max(w / image.width, h / image.height);
-    const cropW = w / scale;
-    const cropH = h / scale;
-    const sx = (image.width - cropW) / 2;
-    const sy = (image.height - cropH) / 2;
-    ctx.drawImage(image, sx, sy, cropW, cropH, 0, 0, w, h);
-    const overlay = ctx.createLinearGradient(0, 0, 0, h);
-    overlay.addColorStop(0, 'rgba(7,7,17,0.60)');
-    overlay.addColorStop(0.48, 'rgba(7,7,17,0.42)');
-    overlay.addColorStop(1, 'rgba(7,7,17,0.82)');
-    ctx.fillStyle = overlay;
-    ctx.fillRect(0, 0, w, h);
-  } else {
-    const bg = ctx.createLinearGradient(0, 0, w, h);
-    bg.addColorStop(0, '#080808');
-    bg.addColorStop(0.5, '#202020');
-    bg.addColorStop(1, '#202020');
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, w, h);
+  if (!layer) {
+    layer = document.createElement('canvas');
+    layer.width = w;
+    layer.height = h;
+    const draw = layer.getContext('2d');
+    if (!draw) throw new Error('Não foi possível preparar as cenas do vídeo.');
+
+    if (imageIndex >= 0) {
+      const image = images[imageIndex];
+      const scale = Math.max(w / image.width, h / image.height);
+      const cropW = w / scale;
+      const cropH = h / scale;
+      const sx = (image.width - cropW) / 2;
+      const sy = (image.height - cropH) / 2;
+      draw.drawImage(image, sx, sy, cropW, cropH, 0, 0, w, h);
+      const overlay = draw.createLinearGradient(0, 0, 0, h);
+      overlay.addColorStop(0, 'rgba(5,5,5,0.72)');
+      overlay.addColorStop(0.48, 'rgba(5,5,5,0.66)');
+      overlay.addColorStop(1, 'rgba(5,5,5,0.92)');
+      draw.fillStyle = overlay;
+      draw.fillRect(0, 0, w, h);
+    } else {
+      const bg = draw.createLinearGradient(0, 0, w, h);
+      bg.addColorStop(0, '#080808');
+      bg.addColorStop(0.56, '#111111');
+      bg.addColorStop(1, '#050505');
+      draw.fillStyle = bg;
+      draw.fillRect(0, 0, w, h);
+    }
+
+    // Subtle, static grid: keeps the AXO look without distracting moving shapes.
+    draw.strokeStyle = 'rgba(215,180,90,0.055)';
+    draw.lineWidth = 1;
+    for (let x = 0; x <= w; x += 72) {
+      draw.beginPath(); draw.moveTo(x, 0); draw.lineTo(x, h); draw.stroke();
+    }
+    for (let y = 0; y <= h; y += 72) {
+      draw.beginPath(); draw.moveTo(0, y); draw.lineTo(w, y); draw.stroke();
+    }
+    const goldGlow = draw.createRadialGradient(560, 235, 8, 560, 235, 460);
+    goldGlow.addColorStop(0, 'rgba(215,180,90,0.16)');
+    goldGlow.addColorStop(1, 'rgba(215,180,90,0)');
+    draw.fillStyle = goldGlow;
+    draw.fillRect(0, 0, w, h);
+
+    draw.fillStyle = '#d7b45a';
+    draw.fillRect(46, 54, 82, 5);
+    draw.font = 'bold 22px Arial, sans-serif';
+    draw.fillStyle = '#ffffff';
+    draw.fillText('AXO STUDIO AI', 46, 96);
+    draw.font = 'bold 15px Arial, sans-serif';
+    draw.fillStyle = '#d7b45a';
+    draw.fillText('CRIATIVIDADE + IA', 46, 158);
+    draw.fillStyle = 'rgba(215,180,90,0.55)';
+    draw.fillRect(46, 184, 628, 2);
+
+    draw.font = 'bold 23px Arial, sans-serif';
+    draw.fillStyle = '#d7b45a';
+    draw.fillText(String(scene.label || 'CAMPANHA').toUpperCase().slice(0, 28), 46, 276);
+    draw.font = 'bold 16px Arial, sans-serif';
+    draw.fillStyle = 'rgba(255,255,255,0.72)';
+    draw.textAlign = 'right';
+    draw.fillText(String(index + 1).padStart(2, '0') + ' / ' + String(sceneList.length).padStart(2, '0'), 674, 276);
+    draw.textAlign = 'left';
+
+    draw.fillStyle = '#ffffff';
+    draw.font = 'bold 45px Arial, sans-serif';
+    const mainText = scene.description || (index === 0 ? c.hook : index === sceneList.length - 1 ? c.caption : c.script);
+    wrapCanvasText(draw, mainText, 46, 352, 628, 59, 6);
+
+    draw.fillStyle = 'rgba(255,255,255,0.15)';
+    draw.fillRect(46, 820, 628, 3);
+
+    const businessText = d.business.length > 37 ? d.business.slice(0, 34) + '…' : d.business;
+    draw.font = 'bold 21px Arial, sans-serif';
+    draw.fillStyle = '#d7b45a';
+    draw.fillText(businessText, 46, 895);
+
+    draw.font = 'bold 27px Arial, sans-serif';
+    draw.fillStyle = '#ffffff';
+    const endText = index === sceneList.length - 1 ? c.caption : 'Uma nova ideia para sua marca.';
+    wrapCanvasText(draw, endText, 46, 958, 628, 38, 3);
+
+    draw.fillStyle = 'rgba(215,180,90,0.7)';
+    draw.fillRect(46, 1138, 90, 5);
+    draw.font = 'bold 16px Arial, sans-serif';
+    draw.fillStyle = 'rgba(255,255,255,0.84)';
+    draw.fillText('SUA IDEIA. SUA CAMPANHA.', 46, 1180);
+    draw.font = '14px Arial, sans-serif';
+    draw.fillStyle = 'rgba(255,255,255,0.64)';
+    draw.fillText('AXO STUDIO AI · VÍDEO VERTICAL', 46, 1218);
+    if (creditLine) {
+      draw.font = '11px Arial, sans-serif';
+      draw.fillStyle = 'rgba(255,255,255,0.88)';
+      const shortCredit = creditLine.length > 94 ? creditLine.slice(0, 91) + '…' : creditLine;
+      draw.fillText('Créditos: ' + shortCredit, 46, 1260);
+    }
+    if (frameCache) frameCache.set(cacheKey, layer);
   }
 
-  ctx.globalAlpha = 0.25;
-  const glow = ctx.createRadialGradient(530 + Math.sin(elapsed * 0.7) * 80, 310 + Math.cos(elapsed * 0.6) * 65, 10, 530, 310, 430);
-  glow.addColorStop(0, '#f0f0f0');
-  glow.addColorStop(1, 'rgba(139,92,246,0)');
-  ctx.fillStyle = glow;
-  ctx.fillRect(0, 0, w, h);
-  ctx.globalAlpha = 1;
-
-  ctx.strokeStyle = 'rgba(196,181,253,0.16)';
-  ctx.lineWidth = 2;
-  for (let r = 110; r <= 390; r += 70) {
-    ctx.beginPath();
-    ctx.arc(560 + Math.sin(elapsed * 0.35) * 35, 335, r, 0, Math.PI * 2);
-    ctx.stroke();
-  }
-
-  ctx.fillStyle = 'rgba(255,255,255,0.08)';
-  ctx.fillRect(42, 48, 230, 54);
-  ctx.fillStyle = '#f0f0f0';
-  ctx.fillRect(42, 48, 6, 54);
-  ctx.font = 'bold 20px Arial, sans-serif';
-  ctx.fillStyle = '#ffffff';
-  ctx.fillText('AXO STUDIO AI', 62, 80);
-  ctx.font = '14px Arial, sans-serif';
-  ctx.fillStyle = '#f2f2f2';
-  ctx.fillText('CAMPANHA CRIADA COM IA', 44, 145);
-
-  ctx.fillStyle = 'rgba(255,255,255,0.12)';
-  ctx.fillRect(44, 202, 108, 40);
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 16px Arial, sans-serif';
-  ctx.fillText(String(index + 1).padStart(2, '0') + ' / ' + String(sceneList.length).padStart(2, '0'), 60, 228);
-
-  ctx.fillStyle = '#f0f0f0';
-  ctx.font = 'bold 22px Arial, sans-serif';
-  ctx.fillText(String(scene.label || 'CAMPANHA').toUpperCase().slice(0, 28), 46, 330);
-
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 48px Arial, sans-serif';
-  const mainText = scene.description || (index === 0 ? c.hook : index === sceneList.length - 1 ? c.caption : c.script);
-  const lineCount = wrapCanvasText(ctx, mainText, 46, 405, 620, 62, 7);
-
-  ctx.fillStyle = 'rgba(255,255,255,0.10)';
-  ctx.fillRect(44, 900, 632, 3);
-  ctx.fillStyle = '#f0f0f0';
-  ctx.fillRect(44, 900, 632 * progress, 3);
-
-  ctx.fillStyle = '#cecece';
-  ctx.font = '20px Arial, sans-serif';
-  const businessText = d.business.length > 33 ? d.business.slice(0, 30) + '…' : d.business;
-  ctx.fillText(businessText, 46, 955);
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 28px Arial, sans-serif';
-  const endText = index === sceneList.length - 1 ? c.caption : 'Uma nova ideia para sua marca.';
-  wrapCanvasText(ctx, endText, 46, 1015, 620, 38, 3);
-
-  ctx.fillStyle = '#f0f0f0';
-  ctx.fillRect(46, 1160, 90, 5);
-  ctx.fillStyle = '#cecece';
-  ctx.font = '16px Arial, sans-serif';
-  ctx.fillText('ROTEIRO • VOZ IA • FORMATO VERTICAL', 46, 1200);
-  ctx.fillStyle = 'rgba(255,255,255,0.65)';
-  ctx.font = '14px Arial, sans-serif';
-  ctx.fillText('Criado com AXO Studio AI', 46, 1238);
-  if (creditLine) {
-    ctx.fillStyle = 'rgba(255,255,255,0.86)';
-    ctx.font = '11px Arial, sans-serif';
-    const shortCredit = creditLine.length > 94 ? creditLine.slice(0, 91) + '…' : creditLine;
-    ctx.fillText('Créditos: ' + shortCredit, 46, 1262);
-  }
+  // Reuse pre-rendered scenes and animate only the slim gold progress bar.
+  ctx.drawImage(layer, 0, 0, w, h);
+  ctx.fillStyle = '#d7b45a';
+  ctx.fillRect(46, 820, 628 * progress, 3);
 }
 
 async function generateVideo(d, c, button, imageFiles, commonsImages) {
@@ -772,7 +788,26 @@ async function generateVideo(d, c, button, imageFiles, commonsImages) {
     const ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('Não foi possível iniciar o editor de vídeo no navegador.');
 
-    canvasStream = canvas.captureStream(30);
+    const videoDuration = audioBuffer.duration + 1.2;
+    const frameCache = new Map();
+    const sceneCount = Array.isArray(c.scenes) && c.scenes.length ? c.scenes.length : 3;
+    const imageCount = visualBitmaps.length;
+    const boundaries = [0, 1];
+    for (let i = 1; i < sceneCount; i++) boundaries.push(i / sceneCount);
+    for (let i = 1; i < imageCount; i++) boundaries.push(i / imageCount);
+    boundaries.sort(function (a, b) { return a - b; });
+    const uniqueBoundaries = boundaries.filter(function (value, index, list) {
+      return index === 0 || Math.abs(value - list[index - 1]) > 0.0001;
+    });
+
+    // Render each distinct scene/image combination before recording to avoid frame drops on scene changes.
+    for (let i = 0; i < uniqueBoundaries.length - 1; i++) {
+      const sampleProgress = (uniqueBoundaries[i] + uniqueBoundaries[i + 1]) / 2;
+      drawVideoFrame(ctx, d, c, sampleProgress * videoDuration, videoDuration, visualBitmaps, creditLine, frameCache);
+    }
+    drawVideoFrame(ctx, d, c, 0, videoDuration, visualBitmaps, creditLine, frameCache);
+
+    canvasStream = canvas.captureStream(24);
     const audioDestination = audioContext.createMediaStreamDestination();
     const source = audioContext.createBufferSource();
     source.buffer = audioBuffer;
@@ -785,15 +820,19 @@ async function generateVideo(d, c, button, imageFiles, commonsImages) {
     const mimeChoices = ['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];
     const selectedMime = mimeChoices.find(function (mime) { return MediaRecorder.isTypeSupported(mime); });
     const recorder = selectedMime
-      ? new MediaRecorder(combinedStream, {mimeType:selectedMime, videoBitsPerSecond:2200000})
+      ? new MediaRecorder(combinedStream, {mimeType:selectedMime, videoBitsPerSecond:1800000})
       : new MediaRecorder(combinedStream);
     const chunks = [];
-    const videoDuration = audioBuffer.duration + 1.2;
     const startTime = performance.now();
+    const frameInterval = 1000 / 24;
+    let lastFrameTime = -Infinity;
     let rafId = 0;
     function paint(now) {
       const elapsed = Math.min(videoDuration, (now - startTime) / 1000);
-      drawVideoFrame(ctx, d, c, elapsed, videoDuration, visualBitmaps, creditLine);
+      if (now - lastFrameTime >= frameInterval - 1 || elapsed >= videoDuration) {
+        drawVideoFrame(ctx, d, c, elapsed, videoDuration, visualBitmaps, creditLine, frameCache);
+        lastFrameTime = now;
+      }
       if (elapsed < videoDuration) rafId = requestAnimationFrame(paint);
     }
 
@@ -804,12 +843,14 @@ async function generateVideo(d, c, button, imageFiles, commonsImages) {
     });
 
     recorder.start(250);
-    drawVideoFrame(ctx, d, c, 0, videoDuration, visualBitmaps, creditLine);
+    const initialTime = performance.now();
+    drawVideoFrame(ctx, d, c, 0, videoDuration, visualBitmaps, creditLine, frameCache);
+    lastFrameTime = initialTime;
     rafId = requestAnimationFrame(paint);
     source.onended = function () {
       setTimeout(function () {
         if (recorder.state !== 'inactive') recorder.stop();
-      }, 900);
+      }, 1350);
     };
     source.start(0);
     await stopped;
