@@ -7,6 +7,8 @@ import vm from "node:vm";
 
 const html = readFileSync("index.html", "utf8");
 const workerSource = readFileSync("api/gemini-worker.js", "utf8");
+const robotsSource = readFileSync("robots.txt", "utf8");
+const sitemapSource = readFileSync("sitemap.xml", "utf8");
 
 function report(name) {
   process.stdout.write("PASS  " + name + "\n");
@@ -45,7 +47,10 @@ for (const fragment of [
   "document.documentElement.dataset.theme",
   'id="whatsappBtn"',
   "const whatsappUrl = 'https://wa.me/?text=' + encodeURIComponent(campaignText)",
-  'html[data-theme="light"] .output p{color:#333}'
+  'html[data-theme="light"] .output p{color:#333}',
+  'rel="canonical"',
+  'property="og:title"',
+  '"@type": "WebSite"'
 ]) {
   assert.ok(html.includes(fragment), "Missing expected site feature: " + fragment);
 }
@@ -56,6 +61,13 @@ assert.equal((html.match(/<script\b/gi) || []).length, (html.match(/<\/script>/g
   "Script opening and closing tags must match.");
 assert.ok(!/AQ\.[A-Za-z0-9_-]{20,}/.test(html), "Possible API key leaked into public HTML.");
 report("Critical features, unique IDs, balanced script tags, and no exposed API-key pattern");
+
+assert.ok(robotsSource.includes("User-agent: *"), "robots.txt should include the general crawler rule.");
+assert.ok(robotsSource.includes("Sitemap: https://chebensonsaintcyr-svg.github.io/axo-studio-ai/sitemap.xml"),
+  "robots.txt should reference the public sitemap.");
+assert.ok(sitemapSource.includes("<urlset") && sitemapSource.includes("<loc>https://chebensonsaintcyr-svg.github.io/axo-studio-ai/</loc>"),
+  "sitemap.xml should list the canonical public site URL.");
+report("Search-engine files and canonical public URL");
 
 // 3. Parse the Cloudflare Worker as an ES module.
 const tempPath = join(tmpdir(), "axo-worker-smoke-test-" + process.pid + ".mjs");
