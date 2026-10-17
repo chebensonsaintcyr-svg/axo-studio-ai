@@ -35,7 +35,14 @@ for (const fragment of [
   "function getCampaignHistory",
   "function saveCampaignHistory",
   "function renderHistory",
-  "localStorage.setItem(HISTORY_STORAGE_KEY"
+  "localStorage.setItem(HISTORY_STORAGE_KEY",
+  'id="themeSelect"',
+  "function applyTheme",
+  "localStorage.setItem(THEME_STORAGE_KEY",
+  'value="silver"',
+  'value="purple"',
+  'value="light"',
+  "document.documentElement.dataset.theme"
 ]) {
   assert.ok(html.includes(fragment), "Missing expected site feature: " + fragment);
 }
