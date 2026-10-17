@@ -11,6 +11,7 @@ const robotsSource = readFileSync("robots.txt", "utf8");
 const sitemapSource = readFileSync("sitemap.xml", "utf8");
 const wranglerSource = readFileSync("wrangler.toml", "utf8");
 const deployWorkerSource = readFileSync(".github/workflows/deploy-worker.yml", "utf8");
+const setupLoginSource = readFileSync("SETUP_LOGIN.md", "utf8");
 
 function report(name) {
   process.stdout.write("PASS  " + name + "\n");
@@ -42,6 +43,9 @@ for (const fragment of [
   'src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"',
   "window.AXO_AUTH_CONFIG",
   "signInWithPassword",
+  "function friendlyAuthError",
+  "2 e-mails por hora",
+  "SMTP Settings",
   "auth.signUp",
   "resetPasswordForEmail",
   "requireAuthSession",
@@ -143,6 +147,11 @@ assert.equal((html.match(/class="feature faq-item"/g) || []).length, 6,
 assert.ok(!html.includes("rgba(139,92,246,0)"), "Video renderer should not use the previous purple glow style.");
 assert.ok(!html.includes("rgba(196,181,253,0.16)"), "Video renderer should not use the previous decorative purple rings.");
 report("Critical features, unique IDs, balanced script tags, and no exposed API-key pattern");
+
+assert.ok(setupLoginSource.includes("2 e-mails por hora"), "Login setup guide should explain the Supabase built-in email quota.");
+assert.ok(setupLoginSource.includes("Authentication → Emails → SMTP Settings"), "Login setup guide should identify where to configure custom SMTP.");
+assert.ok(setupLoginSource.includes("nunca no HTML, no GitHub"), "Login setup guide should warn against committing SMTP credentials.");
+report("Supabase email quota troubleshooting guide");
 assert.ok(html.includes("preparedAudioBase64 = data.audioBase64"), "Previewed narration should be cached for the final render.");
 assert.ok(html.includes("generateVideo(d, c, $('videoBtn'), files, commonsImages, preparedAudioBase64, preparedAudioMimeType)"),
   "The video generator should use the exact audio clip the user previewed.");
