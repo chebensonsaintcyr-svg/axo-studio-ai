@@ -179,8 +179,21 @@ html[data-theme="gold"] .ico{background:#d7b45a12;border-color:#d7b45a33}
 .auth-field input:focus{outline:2px solid #d7b45a;outline-offset:1px;border-color:#d7b45a}
 .auth-notice{padding:14px;border:1px solid #675126;background:#1a160d;border-radius:12px;font-size:13px;line-height:1.6;color:#ede3c9}
 .auth-notice p{margin:8px 0}.auth-notice a{color:#f1d68b;font-weight:750;text-decoration:underline}
-.auth-user{text-align:center;padding:24px 0 8px}.auth-user-check{display:grid;place-items:center;margin:0 auto 12px;width:44px;height:44px;border-radius:50%;background:#292216;color:#e7c873;font-size:24px}
-.auth-user p{font-size:13px;color:#bbb5a7;margin:0 0 6px}.auth-user strong{display:block;overflow-wrap:anywhere;margin-bottom:20px}
+.auth-user{text-align:left;padding:10px 0 0}
+.auth-user-check{display:grid;place-items:center;margin:0 0 12px;width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,#3a3018,#201a0e);border:1px solid #715a2d;color:#f0d17c;font-size:24px}
+.account-eyebrow{display:block;color:#d7b45a;font-size:10px;font-weight:850;letter-spacing:1.7px}
+.auth-user h3{margin:5px 0 8px;font-size:21px;letter-spacing:-.45px;color:#f7f5ef}
+.auth-user .account-description{font-size:13px;line-height:1.65;color:#bbb5a7;margin:0 0 16px}
+.account-email{padding:12px 13px;border:1px solid #302a1d;background:#12110e;border-radius:12px;margin:0 0 10px}
+.account-email span{display:block;font-size:9px;font-weight:800;letter-spacing:1.2px;color:#969082;margin-bottom:4px}
+.account-email strong{display:block;overflow-wrap:anywhere;font-size:13px;color:#f3ecda}
+.account-safety{display:flex;align-items:center;gap:10px;padding:11px 12px;margin:0 0 16px;border:1px solid #29372a;background:#101610;border-radius:12px}
+.account-safety-icon{display:grid;place-items:center;width:28px;height:28px;flex:0 0 28px;border-radius:50%;background:#19301d;color:#a4e0ac;font-weight:900}
+.account-safety strong{display:block;margin:0;color:#e4eee4;font-size:12px}
+.account-safety small{display:block;margin-top:2px;color:#a4b2a4;font-size:10px}
+.auth-user #authLogoutBtn{margin-top:9px}
+.axo-toast{position:fixed;z-index:10000;top:16px;left:50%;transform:translateX(-50%);width:min(440px,calc(100% - 28px));padding:13px 16px;border:1px solid #66542c;border-radius:13px;background:rgba(20,19,15,.97);box-shadow:0 14px 45px #0008;color:#f3e5bb;font-size:13px;font-weight:700;line-height:1.5;text-align:center;backdrop-filter:blur(12px)}
+.axo-toast[hidden]{display:none!important}
 .auth-feedback{min-height:18px;margin:12px 0 0;color:#e8cc7a;font-size:12px;line-height:1.5}.auth-feedback.error{color:#ffaaa4}
 .auth-small{font-size:10px;line-height:1.55;color:#8f8a80;margin:14px 0 0}.auth-dialog [hidden]{display:none!important}
 @media(max-width:600px){.navlinks{gap:10px}.nav-auth{padding:9px 11px}.auth-shell{padding:19px}.auth-top h2{font-size:23px}}
@@ -213,10 +226,21 @@ html[data-theme="gold"] .ico{background:#d7b45a12;border-color:#d7b45a33}
    <div class="auth-tabs" role="tablist" aria-label="Opções de acesso"><button type="button" class="auth-tab is-active" data-auth-mode="signin" role="tab" aria-selected="true">Entrar</button><button type="button" class="auth-tab" data-auth-mode="signup" role="tab" aria-selected="false">Criar conta</button><button type="button" class="auth-tab" data-auth-mode="recover" role="tab" aria-selected="false">Recuperar senha</button></div>
    <form id="authForm"><div class="auth-field" id="authEmailGroup"><label for="authEmail">E-mail</label><input id="authEmail" type="email" autocomplete="email" maxlength="254" placeholder="voce@exemplo.com" required></div><div class="auth-field" id="authPasswordGroup"><label for="authPassword" id="authPasswordLabel">Senha</label><input id="authPassword" type="password" autocomplete="current-password" minlength="8" maxlength="128" placeholder="Mínimo de 8 caracteres" required></div><button type="submit" class="btn full" id="authSubmitBtn">Entrar</button></form>
   </div>
-  <div class="auth-user" id="authUserPanel" hidden><span class="auth-user-check">✓</span><p>Você está conectado como</p><strong id="authUserEmail"></strong><button type="button" class="btn secondary full" id="authLogoutBtn">Sair da conta</button></div>
-  <p class="auth-feedback" id="authFeedback" aria-live="polite" role="status"></p><p class="auth-small">Sua senha é gerenciada pelo provedor de autenticação e não é armazenada no código do site.</p>
+  <div class="auth-user" id="authUserPanel" hidden>
+   <span class="auth-user-check">✓</span>
+   <span class="account-eyebrow">ACESSO CONFIRMADO</span>
+   <h3>Seu espaço está pronto.</h3>
+   <p class="account-description">Sua conta AXO está conectada. O histórico e as preferências deste navegador ficam separados por conta.</p>
+   <div class="account-email"><span>E-MAIL DA CONTA</span><strong id="authUserEmail"></strong></div>
+   <div class="account-safety"><span class="account-safety-icon">✓</span><span><strong>Sessão autenticada</strong><small>Login gerenciado pelo provedor de autenticação.</small></span></div>
+   <button type="button" class="btn full" id="authContinueBtn">Voltar ao AXO</button>
+   <button type="button" class="btn secondary full" id="authLogoutBtn">Sair da conta</button>
+   <p class="auth-small">Os dados desta tela ainda não são sincronizados entre dispositivos.</p>
+  </div>
+  <p class="auth-feedback" id="authFeedback" aria-live="polite" role="status"></p><p class="auth-small" id="authSecurityNote">Sua senha é gerenciada pelo provedor de autenticação e não é armazenada no código do site.</p>
  </div>
 </dialog>
+<div class="axo-toast" id="axoToast" role="status" aria-live="polite" hidden></div>
 <main>
 <section class="wrap hero" id="inicio">
  <div>
@@ -294,7 +318,33 @@ const $ = id => document.getElementById(id);
 $('year').textContent = new Date().getFullYear();
 
 const THEME_STORAGE_KEY = 'axoStudioThemeV2';
+const HISTORY_STORAGE_KEY = 'axoStudioCampaignHistoryV1';
+const HISTORY_LIMIT = 10;
 const AVAILABLE_THEMES = new Set(['gold', 'silver', 'purple', 'light']);
+// Per-account browser scope: do not show one signed-in user's history/preferences to another.
+let activeAccountScope = 'guest';
+
+function scopedStorageKey(baseKey) {
+  return baseKey + ':' + activeAccountScope;
+}
+
+function readSavedThemeForScope() {
+  try {
+    const scopedTheme = localStorage.getItem(scopedStorageKey(THEME_STORAGE_KEY));
+    if (AVAILABLE_THEMES.has(scopedTheme)) return scopedTheme;
+    // Preserve the older global theme as a guest-only preference, never as a new user's preference.
+    if (activeAccountScope === 'guest') {
+      const legacyTheme = localStorage.getItem(THEME_STORAGE_KEY);
+      if (AVAILABLE_THEMES.has(legacyTheme)) {
+        localStorage.setItem(scopedStorageKey(THEME_STORAGE_KEY), legacyTheme);
+        return legacyTheme;
+      }
+    }
+  } catch (err) {
+    // The default theme remains available if browser storage is blocked.
+  }
+  return 'gold';
+}
 
 function applyTheme(theme, saveChoice) {
   const chosenTheme = AVAILABLE_THEMES.has(theme) ? theme : 'gold';
@@ -306,22 +356,16 @@ function applyTheme(theme, saveChoice) {
   }
   if (saveChoice) {
     try {
-      localStorage.setItem(THEME_STORAGE_KEY, chosenTheme);
-      $('themeStatus').textContent = 'Preferência salva neste navegador';
+      localStorage.setItem(scopedStorageKey(THEME_STORAGE_KEY), chosenTheme);
+      $('themeStatus').textContent = activeAccountScope === 'guest'
+        ? 'Preferência salva neste navegador'
+        : 'Preferência salva para esta conta neste navegador';
     } catch (err) {
       $('themeStatus').textContent = 'Tema aplicado até fechar o navegador';
     }
   }
 }
-
-let savedTheme = 'gold';
-try {
-  const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
-  if (AVAILABLE_THEMES.has(storedTheme)) savedTheme = storedTheme;
-} catch (err) {
-  // O seletor continua funcionando mesmo se o navegador bloquear armazenamento local.
-}
-applyTheme(savedTheme, false);
+applyTheme(readSavedThemeForScope(), false);
 $('themeSelect').addEventListener('change', function () {
   applyTheme($('themeSelect').value, true);
 });
@@ -357,6 +401,22 @@ if (hasAuthConfiguration()) {
 function setAuthFeedback(message, isError) {
   authFeedback.textContent = message || '';
   authFeedback.classList.toggle('error', Boolean(isError));
+}
+let axoToastTimer = null;
+function closeAuthDialog() {
+  if (authDialog.open && typeof authDialog.close === 'function') authDialog.close();
+  else authDialog.removeAttribute('open');
+}
+function showAccountToast(message) {
+  const toast = $('axoToast');
+  if (!toast) return;
+  toast.textContent = message;
+  toast.hidden = false;
+  if (axoToastTimer) window.clearTimeout(axoToastTimer);
+  axoToastTimer = window.setTimeout(function () {
+    toast.hidden = true;
+    axoToastTimer = null;
+  }, 4200);
 }
 function friendlyAuthError(error, mode) {
   const message = String(error && error.message || '').trim();
@@ -401,15 +461,23 @@ function setAuthMode(mode) {
 function syncAuthInterface(session) {
   currentAuthSession = session || null;
   const hasSession = Boolean(currentAuthSession && currentAuthSession.access_token && currentAuthSession.user);
+  const nextScope = hasSession && currentAuthSession.user.id ? 'user:' + currentAuthSession.user.id : 'guest';
+  const scopeChanged = nextScope !== activeAccountScope;
+  activeAccountScope = nextScope;
   const configured = Boolean(authClient);
   $('authSetupNotice').hidden = configured;
   $('authControls').hidden = !configured || hasSession;
   $('authUserPanel').hidden = !hasSession;
+  $('authSecurityNote').hidden = hasSession;
   $('authIntro').textContent = !configured
     ? 'O acesso por conta será ativado depois de conectar o provedor de autenticação.'
-    : hasSession ? 'Sua sessão está ativa neste navegador.' : 'Entre ou crie sua conta para usar a geração de campanhas e narração por IA.';
+    : hasSession ? 'Bem-vindo de volta. Seu espaço de criação está pronto.' : 'Entre ou crie sua conta para usar a geração de campanhas e narração por IA.';
   authOpenButton.textContent = hasSession ? 'Minha conta' : 'Entrar';
   if (hasSession) $('authUserEmail').textContent = currentAuthSession.user.email || 'Conta AXO';
+  if (scopeChanged) {
+    applyTheme(readSavedThemeForScope(), false);
+    renderHistory();
+  }
 }
 function openAuthDialog(mode) {
   setAuthMode(mode || 'signin');
@@ -421,9 +489,8 @@ function openAuthDialog(mode) {
   if (!authClient) setAuthFeedback('Siga o guia de configuração para ativar o login.', true);
 }
 authOpenButton.addEventListener('click', function () { openAuthDialog('signin'); });
-$('authCloseBtn').addEventListener('click', function () {
-  if (typeof authDialog.close === 'function') authDialog.close(); else authDialog.removeAttribute('open');
-});
+$('authCloseBtn').addEventListener('click', closeAuthDialog);
+$('authContinueBtn').addEventListener('click', closeAuthDialog);
 authDialog.addEventListener('click', function (event) {
   if (event.target === authDialog) {
     if (typeof authDialog.close === 'function') authDialog.close(); else authDialog.removeAttribute('open');
@@ -469,7 +536,8 @@ $('authForm').addEventListener('submit', async function (event) {
       if (result.error) throw result.error;
       if (result.data && result.data.session) {
         syncAuthInterface(result.data.session);
-        setAuthFeedback('Conta criada e sessão iniciada.');
+        closeAuthDialog();
+        showAccountToast('Conta criada. Bem-vindo ao AXO.');
       } else {
         setAuthFeedback('Confira seu e-mail para confirmar o cadastro e depois entre na sua conta.');
       }
@@ -490,7 +558,8 @@ $('authForm').addEventListener('submit', async function (event) {
       result = await authClient.auth.signInWithPassword({ email, password });
       if (result.error) throw result.error;
       syncAuthInterface(result.data.session);
-      setAuthFeedback('Login realizado com sucesso.');
+      closeAuthDialog();
+      showAccountToast('Acesso confirmado. Bem-vindo ao AXO.');
     }
   } catch (err) {
     setAuthFeedback(friendlyAuthError(err, currentAuthMode), true);
@@ -506,7 +575,8 @@ $('authLogoutBtn').addEventListener('click', async function () {
     if (result.error) throw result.error;
     syncAuthInterface(null);
     setAuthMode('signin');
-    setAuthFeedback('Você saiu da sua conta.');
+    closeAuthDialog();
+    showAccountToast('Você saiu da sua conta.');
   } catch (err) {
     setAuthFeedback('Não foi possível sair agora. Tente novamente.', true);
   } finally { $('authLogoutBtn').disabled = false; }
@@ -514,6 +584,10 @@ $('authLogoutBtn').addEventListener('click', async function () {
 if (authClient) {
   authClient.auth.onAuthStateChange(function (event, session) {
     syncAuthInterface(session);
+    if (event === 'SIGNED_IN' && authDialog.open) {
+      closeAuthDialog();
+      showAccountToast('Acesso confirmado. Bem-vindo ao AXO.');
+    }
     if (event === 'PASSWORD_RECOVERY') {
       openAuthDialog('newpassword');
       setAuthFeedback('Crie sua nova senha abaixo.');
@@ -525,12 +599,9 @@ if (authClient) {
 } else { syncAuthInterface(null); }
 setAuthMode('signin');
 
-const HISTORY_STORAGE_KEY = 'axoStudioCampaignHistoryV1';
-const HISTORY_LIMIT = 10;
-
 function getCampaignHistory() {
   try {
-    const parsed = JSON.parse(localStorage.getItem(HISTORY_STORAGE_KEY) || '[]');
+    const parsed = JSON.parse(localStorage.getItem(scopedStorageKey(HISTORY_STORAGE_KEY)) || '[]');
     return Array.isArray(parsed) ? parsed.filter(function (item) {
       return item && item.id && item.brief && item.campaign && item.brief.business;
     }).slice(0, HISTORY_LIMIT) : [];
@@ -571,7 +642,7 @@ function saveCampaignHistory(brief, campaign) {
       campaign: campaign
     };
     const history = [entry].concat(getCampaignHistory()).slice(0, HISTORY_LIMIT);
-    localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history));
+    localStorage.setItem(scopedStorageKey(HISTORY_STORAGE_KEY), JSON.stringify(history));
     renderHistory();
   } catch (err) {
     console.warn('Não foi possível salvar o histórico localmente.', err);
@@ -1491,7 +1562,7 @@ $('historyList').addEventListener('click', function (event) {
 
   if (action === 'delete') {
     try {
-      localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(entries.filter(function (item) {
+      localStorage.setItem(scopedStorageKey(HISTORY_STORAGE_KEY), JSON.stringify(entries.filter(function (item) {
         return String(item.id) !== String(id);
       })));
       renderHistory();
