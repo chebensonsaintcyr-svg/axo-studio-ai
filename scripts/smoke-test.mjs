@@ -44,6 +44,17 @@ for (const fragment of [
   "rgba(215,180,90,0.055)",
   "drawVideoFrame(ctx, d, c, elapsed, videoDuration, visualBitmaps, creditLine, frameCache)",
   'id="previewVoiceBtn"',
+  'id="buildProductionKitBtn"',
+  'id="creativeLook"',
+  'id="creativeMood"',
+  'id="creativeTempo"',
+  'id="creativeRatio"',
+  'id="productionKitOutput"',
+  "Prompt visual · Cena",
+  "Prompt de trilha musical",
+  "Plano de efeitos sonoros",
+  "Prompt negativo / evitar",
+  "axo-kit-producao.txt",
   "const AXO_SINGLE_VOICE_STYLE",
   "No second voice, dialogue, chorus, echo",
   "if (suppliedAudioBase64)",
@@ -91,6 +102,7 @@ assert.ok(html.includes("generateVideo(d, c, $('videoBtn'), files, commonsImages
   "The video generator should use the exact audio clip the user previewed.");
 report("Video renderer uses cached scenes, a 24 fps cap, and AXO gold styling");
 report("Single-speaker narration preview and reuse of the exact approved voice clip");
+report("Creative production kit controls, prompts, and TXT export");
 
 assert.ok(robotsSource.includes("User-agent: *"), "robots.txt should include the general crawler rule.");
 assert.ok(robotsSource.includes("Sitemap: https://chebensonsaintcyr-svg.github.io/axo-studio-ai/sitemap.xml"),
