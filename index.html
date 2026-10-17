@@ -329,6 +329,8 @@ $('themeSelect').addEventListener('change', function () {
 
 // AXO account: Supabase Auth (email/password) with persisted sessions.
 const AXO_AUTH_SETTINGS = window.AXO_AUTH_CONFIG || {};
+// Always send authentication callbacks to the public AXO site, even when signup starts in a local preview.
+const AXO_PUBLIC_URL = 'https://chebensonsaintcyr-svg.github.io/axo-studio-ai/';
 let authClient = null;
 let currentAuthSession = null;
 let currentAuthMode = 'signin';
@@ -462,7 +464,7 @@ $('authForm').addEventListener('submit', async function (event) {
     if (currentAuthMode === 'signup') {
       result = await authClient.auth.signUp({
         email, password,
-        options: { emailRedirectTo: window.location.href.split('#')[0] }
+        options: { emailRedirectTo: AXO_PUBLIC_URL }
       });
       if (result.error) throw result.error;
       if (result.data && result.data.session) {
@@ -473,7 +475,7 @@ $('authForm').addEventListener('submit', async function (event) {
       }
     } else if (currentAuthMode === 'recover') {
       result = await authClient.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.href.split('#')[0]
+        redirectTo: AXO_PUBLIC_URL
       });
       if (result.error) throw result.error;
       setAuthFeedback('Se o e-mail estiver cadastrado, você receberá um link para recuperar a senha.');
