@@ -43,6 +43,11 @@ for (const fragment of [
   "const frameInterval = 1000 / 24",
   "rgba(215,180,90,0.055)",
   "drawVideoFrame(ctx, d, c, elapsed, videoDuration, visualBitmaps, creditLine, frameCache)",
+  'id="previewVoiceBtn"',
+  "const AXO_SINGLE_VOICE_STYLE",
+  "No second voice, dialogue, chorus, echo",
+  "if (suppliedAudioBase64)",
+  "The video will use exactly this approved audio",
   "searchCommonsImages(d.product, true)",
   "function buildCommonsCredit",
   "id=\"historyList\"",
@@ -81,7 +86,11 @@ assert.equal((html.match(/class="feature faq-item"/g) || []).length, 6,
 assert.ok(!html.includes("rgba(139,92,246,0)"), "Video renderer should not use the previous purple glow style.");
 assert.ok(!html.includes("rgba(196,181,253,0.16)"), "Video renderer should not use the previous decorative purple rings.");
 report("Critical features, unique IDs, balanced script tags, and no exposed API-key pattern");
+assert.ok(html.includes("preparedAudioBase64 = data.audioBase64"), "Previewed narration should be cached for the final render.");
+assert.ok(html.includes("generateVideo(d, c, $('videoBtn'), files, commonsImages, preparedAudioBase64, preparedAudioMimeType)"),
+  "The video generator should use the exact audio clip the user previewed.");
 report("Video renderer uses cached scenes, a 24 fps cap, and AXO gold styling");
+report("Single-speaker narration preview and reuse of the exact approved voice clip");
 
 assert.ok(robotsSource.includes("User-agent: *"), "robots.txt should include the general crawler rule.");
 assert.ok(robotsSource.includes("Sitemap: https://chebensonsaintcyr-svg.github.io/axo-studio-ai/sitemap.xml"),
