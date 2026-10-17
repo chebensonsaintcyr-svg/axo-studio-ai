@@ -32,6 +32,20 @@ for (const fragment of [
   'id="campaignForm"',
   'id="exampleBtn"',
   'id="heroExampleBtn"',
+  "ETAPA 1 · CAMPANHA",
+  "ETAPA 2 · DIREÇÃO CRIATIVA",
+  "ETAPA 3 · VÍDEO",
+  "Campanha para ",
+  "Revise o texto primeiro. Depois monte o visual e o vídeo.",
+  'class="copy-card"',
+  'class="result-accordion"',
+  "Opcional · fotos do Commons ou suas próprias",
+  "class=\"result-video-step\"",
+  'class="history-details"',
+  "Ver campanhas salvas",
+  "const THEME_STORAGE_KEY = 'axoStudioThemeV2'",
+  'option value="gold">Preto e dourado',
+  "html[data-theme=\"gold\"] .btn:not(.secondary)",
   "function showExampleCampaign",
   "Exemplo demonstrativo · sem chamada à IA",
   'https://axo-studio-ai-api.chebensonsaintcyr.workers.dev/',
@@ -103,6 +117,7 @@ assert.ok(html.includes("generateVideo(d, c, $('videoBtn'), files, commonsImages
 report("Video renderer uses cached scenes, a 24 fps cap, and AXO gold styling");
 report("Single-speaker narration preview and reuse of the exact approved voice clip");
 report("Creative production kit controls, prompts, and TXT export");
+report("Organized result steps, optional image accordion, collapsible history, and default gold theme");
 
 assert.ok(robotsSource.includes("User-agent: *"), "robots.txt should include the general crawler rule.");
 assert.ok(robotsSource.includes("Sitemap: https://chebensonsaintcyr-svg.github.io/axo-studio-ai/sitemap.xml"),
