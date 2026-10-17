@@ -1715,16 +1715,19 @@ const AXO_REEL_VOICE_REQUESTS = [
     filename: 'axo-reel-03-voz-masculina.wav'
   }
 ];
-const AXO_REEL_MALE_ENERGETIC_STYLE = 'Energetic solo male Brazilian Portuguese advertising voice, natural confident upbeat delivery, clear articulation, medium-fast pace and lively intonation. No music, echo, chorus, dialogue or extra voices.';
+const AXO_REEL_MALE_ENERGETIC_STYLE = 'Energetic solo male voice in natural Brazilian Portuguese; confident, upbeat, clear articulation, medium-fast pace, lively intonation. No music, echo, chorus or extra voices.';
 let axoReelVoiceUrls = ['', '', ''];
 const generateReelVoicesButton = $('generateReelVoicesBtn');
 const reelVoiceStatus = $('reelVoiceStatus');
 
 generateReelVoicesButton.addEventListener('click', async function () {
-  const session = await requireAuthSession();
-  if (!session || !session.access_token) return;
-
   generateReelVoicesButton.disabled = true;
+  const session = await requireAuthSession();
+  if (!session || !session.access_token) {
+    generateReelVoicesButton.disabled = false;
+    return;
+  }
+
   generateReelVoicesButton.textContent = 'Gerando as narrações...';
   reelVoiceStatus.textContent = 'Preparando a primeira faixa. Aguarde enquanto o AXO gera as três vozes.';
   try {
