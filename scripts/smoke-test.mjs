@@ -13,7 +13,7 @@ function report(name) {
 }
 
 // 1. Parse all inline JavaScript in the public page before deploying.
-const scriptBlocks = [...html.matchAll(/<script\\b[^>]*>([\\s\\S]*?)<\\/script>/gi)]
+const scriptBlocks = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)]
   .map((match) => match[1])
   .filter((value) => value.trim());
 assert.equal(scriptBlocks.length, 1, "Expected one inline application script.");
@@ -34,12 +34,12 @@ for (const fragment of [
 ]) {
   assert.ok(html.includes(fragment), "Missing expected site feature: " + fragment);
 }
-const ids = [...html.matchAll(/\\bid=["']([^"']+)["']/g)].map((match) => match[1]);
+const ids = [...html.matchAll(/\bid=["']([^"']+)["']/g)].map((match) => match[1]);
 const duplicatedIds = ids.filter((id, index) => ids.indexOf(id) !== index);
 assert.deepEqual([...new Set(duplicatedIds)], [], "HTML contains duplicate IDs.");
-assert.equal((html.match(/<script\\b/gi) || []).length, (html.match(/<\\/script>/gi) || []).length,
+assert.equal((html.match(/<script\b/gi) || []).length, (html.match(/<\/script>/gi) || []).length,
   "Script opening and closing tags must match.");
-assert.ok(!/AQ\\.[A-Za-z0-9_-]{20,}/.test(html), "Possible API key leaked into public HTML.");
+assert.ok(!/AQ\.[A-Za-z0-9_-]{20,}/.test(html), "Possible API key leaked into public HTML.");
 report("Critical features, unique IDs, balanced script tags, and no exposed API-key pattern");
 
 // 3. Parse the Cloudflare Worker as an ES module.
