@@ -15,8 +15,9 @@ function report(name) {
 }
 
 // 1. Parse all inline JavaScript in the public page before deploying.
-const scriptBlocks = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)]
-  .map((match) => match[1])
+const scriptBlocks = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)]
+  .filter((match) => !/\btype\s*=\s*["']application\/ld\+json["']/i.test(match[1]))
+  .map((match) => match[2])
   .filter((value) => value.trim());
 assert.equal(scriptBlocks.length, 1, "Expected one inline application script.");
 for (const source of scriptBlocks) {
