@@ -28,6 +28,10 @@ report("HTML inline JavaScript syntax");
 // 2. Verify core UI features stay present and key IDs are not duplicated.
 for (const fragment of [
   'id="campaignForm"',
+  'id="exampleBtn"',
+  'id="heroExampleBtn"',
+  "function showExampleCampaign",
+  "Exemplo demonstrativo · sem chamada à IA",
   'https://axo-studio-ai-api.chebensonsaintcyr.workers.dev/',
   "https://commons.wikimedia.org/w/api.php",
   "function generateVideo",
@@ -83,6 +87,10 @@ const workerModule = await import(pathToFileURL(tempPath).href + "?test=" + Date
 const worker = workerModule.default;
 assert.ok(worker && typeof worker.fetch === "function", "Worker must export a fetch handler.");
 report("Worker ES module syntax and export");
+assert.ok(workerSource.includes("MAX_REQUEST_BODY_BYTES = 12_000"), "Worker should cap request body size.");
+assert.ok(workerSource.includes("MAX_REQUESTS_PER_MINUTE = 5"), "Worker should enforce a conservative per-IP request limit.");
+assert.ok(workerSource.includes("application/json"), "Worker should reject unsupported request content types.");
+report("Worker request-size, content-type, and rate-limit safeguards");
 
 // 4. Mock the Gemini API so tests are safe, deterministic, and do not spend API quota.
 const previousFetch = globalThis.fetch;
@@ -150,6 +158,22 @@ try {
   }), env);
   assert.equal(invalidOrigin.status, 403, "Untrusted origins should be blocked.");
   report("Untrusted origin blocked");
+
+  const oversizedResponse = await worker.fetch(new Request("https://test-worker.local/", {
+    method: "POST",
+    headers: { "Origin": origin, "Content-Type": "application/json", "CF-Connecting-IP": "198.51.100.12" },
+    body: JSON.stringify({ payload: "x".repeat(13_000) })
+  }), env);
+  assert.equal(oversizedResponse.status, 413, "Oversized request bodies should be rejected before an upstream AI call.");
+  report("Oversized request body rejected");
+
+  const invalidJsonShape = await worker.fetch(new Request("https://test-worker.local/", {
+    method: "POST",
+    headers: { "Origin": origin, "Content-Type": "application/json", "CF-Connecting-IP": "198.51.100.13" },
+    body: JSON.stringify([])
+  }), env);
+  assert.equal(invalidJsonShape.status, 400, "A JSON array should not be accepted as a request object.");
+  report("Invalid JSON object shape rejected");
 
   const campaignResponse = await worker.fetch(campaignRequest(), env);
   assert.equal(campaignResponse.status, 200, "Campaign endpoint should respond successfully.");
