@@ -57,6 +57,14 @@ for (const fragment of [
   "'Authorization':'Bearer ' + authSession.access_token",
   'id="exampleBtn"',
   'id="heroExampleBtn"',
+  'id="reelVoiceSection"',
+  'id="generateReelVoicesBtn"',
+  'id="reelVoicePlayer0"',
+  'id="reelVoicePlayer1"',
+  'id="reelVoicePlayer2"',
+  'id="reelVoiceDownload0"',
+  'id="reelVoiceDownload1"',
+  'id="reelVoiceDownload2"',
   "ETAPA 1 · CAMPANHA",
   "ETAPA 2 · DIREÇÃO CRIATIVA",
   "ETAPA 3 · VÍDEO",
@@ -117,6 +125,11 @@ for (const fragment of [
   "Prompt negativo / evitar",
   "axo-kit-producao.txt",
   "const AXO_SINGLE_VOICE_STYLE",
+  "const AXO_REEL_VOICE_REQUESTS",
+  "const AXO_REEL_MALE_ENERGETIC_STYLE",
+  "voice: 'Fenrir'",
+  "Generate the three approved AXO Reel voiceovers",
+  "Nada foi publicado ou agendado.",
   "No second voice, dialogue, chorus, echo",
   "if (suppliedAudioBase64)",
   "O vídeo usará exatamente esta faixa de áudio, sem gerar uma segunda voz.",
@@ -163,6 +176,10 @@ assert.ok(!html.includes("rgba(139,92,246,0)"), "Video renderer should not use t
 assert.ok(!html.includes("rgba(196,181,253,0.16)"), "Video renderer should not use the previous decorative purple rings.");
 report("Critical features, unique IDs, balanced script tags, and no exposed API-key pattern");
 
+assert.equal((html.match(/id="reelVoicePlayer[012]"/g) || []).length, 3, "The Reel voice studio should contain exactly three preview players.");
+assert.equal((html.match(/id="reelVoiceDownload[012]"/g) || []).length, 3, "The Reel voice studio should expose one download per generated narration.");
+assert.ok(html.includes("voice: 'Fenrir'"), "Reel voice generation should use the selected masculine-coded voice.");
+assert.ok(html.includes("Energetic solo male voice in natural Brazilian Portuguese"), "Reel voice generation should request an energetic Brazilian Portuguese male style.");
 assert.ok(setupLoginSource.includes("2 e-mails por hora"), "Login setup guide should explain the Supabase built-in email quota.");
 assert.ok(setupLoginSource.includes("Authentication → Emails → SMTP Settings"), "Login setup guide should identify where to configure custom SMTP.");
 assert.ok(setupLoginSource.includes("nunca no HTML, no GitHub"), "Login setup guide should warn against committing SMTP credentials.");

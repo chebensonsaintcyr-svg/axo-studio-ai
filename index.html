@@ -198,6 +198,29 @@ html[data-theme="gold"] .ico{background:#d7b45a12;border-color:#d7b45a33}
 .auth-small{font-size:10px;line-height:1.55;color:#8f8a80;margin:14px 0 0}.auth-dialog [hidden]{display:none!important}
 @media(max-width:600px){.navlinks{gap:10px}.nav-auth{padding:9px 11px}.auth-shell{padding:19px}.auth-top h2{font-size:23px}}
 
+
+/* AXO Reel Voice Studio */
+.reel-voice-panel{max-width:860px;margin:0 auto;border-color:#4d3e21;background:linear-gradient(145deg,#14120d,#0b0b0b)}
+.reel-voice-intro{display:flex;gap:14px;align-items:center;margin-bottom:18px}
+.reel-voice-icon{display:grid;place-items:center;flex:0 0 46px;height:46px;border-radius:14px;background:#d7b45a18;border:1px solid #d7b45a50;color:#e4c575;font-size:25px}
+.reel-voice-intro h3{margin:0 0 4px;font-size:17px;color:#f5f1e7}
+.reel-voice-intro p{margin:0;color:var(--muted);font-size:12px;line-height:1.5}
+.reel-voice-list{display:grid;gap:10px;margin:18px 0}
+.reel-voice-item{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;border:1px solid var(--line);border-radius:13px;background:#0a0a0a;padding:14px}
+.reel-voice-info>span{font-size:10px;letter-spacing:1.4px;font-weight:850;color:#d7b45a}
+.reel-voice-info h4{margin:4px 0;font-size:15px;color:#f7f4eb}
+.reel-voice-info p{margin:0;color:var(--muted);font-size:12px}
+.reel-voice-item audio{width:100%;min-height:40px}
+.reel-voice-download{width:max-content;max-width:100%;font-size:12px}
+.reel-voice-item [hidden]{display:none!important}
+#generateReelVoicesBtn:disabled{opacity:.6;cursor:wait}
+html[data-theme="light"] .reel-voice-panel{background:linear-gradient(145deg,#fff,#f6f6f3);border-color:#d5d5d2}
+html[data-theme="light"] .reel-voice-intro h3,html[data-theme="light"] .reel-voice-info h4{color:#171717}
+html[data-theme="light"] .reel-voice-item{background:#fff;border-color:#d5d5d2}
+html[data-theme="purple"] .reel-voice-icon{background:#a855f71c;border-color:#c084fc55;color:#d8b4fe}
+@media(min-width:700px){.reel-voice-item{grid-template-columns:minmax(180px,1fr) minmax(220px,1.2fr) auto;align-items:center}.reel-voice-item audio{grid-column:auto}.reel-voice-download{justify-self:end}}
+@media(max-width:520px){.reel-voice-panel{padding:14px}.reel-voice-item{padding:12px}.reel-voice-download{width:100%}}
+
 </style>
 </head>
 <body>
@@ -292,6 +315,33 @@ html[data-theme="gold"] .ico{background:#d7b45a12;border-color:#d7b45a33}
    <div class="history-list" id="historyList"><p class="tiny">Nenhuma campanha salva ainda. Gere sua primeira campanha para vê-la aqui.</p></div>
   </details>
  </section>
+</div></section>
+
+<section class="section" id="reelVoiceSection"><div class="wrap">
+ <div class="sectionhead"><div class="kicker">AXO VOICE STUDIO</div><h2>Nova voz para seus 3 Reels.</h2><p class="sub">Gere uma narração masculina em português brasileiro, com mais energia e ritmo natural. Ouça e aprove cada faixa antes de substituir o áudio dos vídeos.</p></div>
+ <div class="panel reel-voice-panel">
+  <div class="reel-voice-intro"><span class="reel-voice-icon">♫</span><div><h3>Voz masculina · Estilo energético</h3><p>Voz individual, clara e confiante. Sem música, eco, coro ou vozes sobrepostas.</p></div></div>
+  <div class="reel-voice-list">
+   <article class="reel-voice-item">
+    <div class="reel-voice-info"><span>REEL 01</span><h4>Sem ideias para postar?</h4><p>Apresenta o problema e introduz a AXO.</p></div>
+    <audio id="reelVoicePlayer0" controls preload="none" hidden></audio>
+    <a class="btn secondary reel-voice-download" id="reelVoiceDownload0" hidden download="axo-reel-01-voz-masculina.wav">Baixar áudio 1</a>
+   </article>
+   <article class="reel-voice-item">
+    <div class="reel-voice-info"><span>REEL 02</span><h4>Uma ideia, uma campanha</h4><p>Mostra o que a AXO ajuda a criar.</p></div>
+    <audio id="reelVoicePlayer1" controls preload="none" hidden></audio>
+    <a class="btn secondary reel-voice-download" id="reelVoiceDownload1" hidden download="axo-reel-02-voz-masculina.wav">Baixar áudio 2</a>
+   </article>
+   <article class="reel-voice-item">
+    <div class="reel-voice-info"><span>REEL 03</span><h4>Comece agora</h4><p>Convida o público a testar a plataforma.</p></div>
+    <audio id="reelVoicePlayer2" controls preload="none" hidden></audio>
+    <a class="btn secondary reel-voice-download" id="reelVoiceDownload2" hidden download="axo-reel-03-voz-masculina.wav">Baixar áudio 3</a>
+   </article>
+  </div>
+  <button type="button" class="btn full" id="generateReelVoicesBtn">Gerar as 3 novas narrações</button>
+  <p class="notice" id="reelVoiceStatus" aria-live="polite">Entre na sua conta AXO para gerar os áudios. Cada faixa será criada pelo serviço de voz do AXO, e não será publicada automaticamente.</p>
+  <p class="tiny">Depois de ouvir e baixar os três arquivos, envie-os nesta conversa para eu substituir o áudio dos vídeos. Nenhum Reel será agendado por esta ferramenta.</p>
+ </div>
 </div></section>
 <section class="section" id="como-funciona"><div class="wrap">
  <div class="sectionhead"><div class="kicker">Simples por design</div><h2>Da ideia à execução em três passos.</h2></div>
@@ -1649,6 +1699,87 @@ $('campaignForm').addEventListener('submit', async function (event) {
     button.style.opacity = '1';
   }
 });
+
+/* Generate the three approved AXO Reel voiceovers through the existing authenticated Gemini TTS Worker. */
+const AXO_REEL_VOICE_REQUESTS = [
+  {
+    text: 'Travou na hora de criar conteúdo para o seu negócio? Você não precisa começar do zero. Com a AXO Studio AI, transforme sua ideia em roteiro, legenda e plano de cenas. Experimente grátis no link da bio.',
+    filename: 'axo-reel-01-voz-masculina.wav'
+  },
+  {
+    text: 'Descreva seu negócio, seu produto e seu público. A AXO ajuda a montar o gancho, o roteiro, a legenda e o plano de cenas. Revise as ideias e dê o próximo passo na sua criação.',
+    filename: 'axo-reel-02-voz-masculina.wav'
+  },
+  {
+    text: 'Quer divulgar seu negócio, mas não sabe por onde começar? Na AXO, descreva seu produto, gere uma primeira campanha e revise as ideias para a sua marca. Acesse a AXO Studio AI e experimente.',
+    filename: 'axo-reel-03-voz-masculina.wav'
+  }
+];
+const AXO_REEL_MALE_ENERGETIC_STYLE = 'Energetic solo male voice in natural Brazilian Portuguese; confident, upbeat, clear articulation, medium-fast pace, lively intonation. No music, echo, chorus or extra voices.';
+let axoReelVoiceUrls = ['', '', ''];
+const generateReelVoicesButton = $('generateReelVoicesBtn');
+const reelVoiceStatus = $('reelVoiceStatus');
+
+generateReelVoicesButton.addEventListener('click', async function () {
+  generateReelVoicesButton.disabled = true;
+  const session = await requireAuthSession();
+  if (!session || !session.access_token) {
+    generateReelVoicesButton.disabled = false;
+    return;
+  }
+
+  generateReelVoicesButton.textContent = 'Gerando as narrações...';
+  reelVoiceStatus.textContent = 'Preparando a primeira faixa. Aguarde enquanto o AXO gera as três vozes.';
+  try {
+    for (let i = 0; i < AXO_REEL_VOICE_REQUESTS.length; i++) {
+      reelVoiceStatus.textContent = 'Gerando narração ' + (i + 1) + ' de 3...';
+      const response = await fetch('https://axo-studio-ai-api.chebensonsaintcyr.workers.dev/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + session.access_token
+        },
+        body: JSON.stringify({
+          action: 'speech',
+          text: AXO_REEL_VOICE_REQUESTS[i].text,
+          voice: 'Fenrir',
+          style: AXO_REEL_MALE_ENERGETIC_STYLE
+        })
+      });
+      let data;
+      try { data = await response.json(); }
+      catch (err) { throw new Error('O serviço de voz retornou uma resposta inválida.'); }
+      if (!response.ok) {
+        throw new Error(data && data.error ? data.error : 'Não foi possível gerar a narração ' + (i + 1) + '.');
+      }
+      if (!data || !data.audioBase64) throw new Error('A narração ' + (i + 1) + ' veio sem áudio.');
+      const binary = atob(data.audioBase64);
+      const bytes = new Uint8Array(binary.length);
+      for (let j = 0; j < binary.length; j++) bytes[j] = binary.charCodeAt(j);
+      const audioBlob = new Blob([bytes], {type: data.mimeType || 'audio/wav'});
+      if (!audioBlob.size) throw new Error('A narração ' + (i + 1) + ' veio vazia.');
+
+      if (axoReelVoiceUrls[i]) URL.revokeObjectURL(axoReelVoiceUrls[i]);
+      axoReelVoiceUrls[i] = URL.createObjectURL(audioBlob);
+      const player = $('reelVoicePlayer' + i);
+      player.src = axoReelVoiceUrls[i];
+      player.hidden = false;
+      const download = $('reelVoiceDownload' + i);
+      download.href = axoReelVoiceUrls[i];
+      download.download = AXO_REEL_VOICE_REQUESTS[i].filename;
+      download.hidden = false;
+    }
+    reelVoiceStatus.textContent = 'As três narrações foram geradas. Ouça cada faixa e baixe os WAVs para enviá-los nesta conversa. Nada foi publicado ou agendado.';
+    generateReelVoicesButton.textContent = 'Gerar novamente as 3 narrações';
+  } catch (err) {
+    reelVoiceStatus.textContent = (err && err.message ? err.message : 'Não foi possível terminar as narrações.') +
+      ' Os arquivos que já foram gerados continuam disponíveis para ouvir e baixar.';
+    generateReelVoicesButton.textContent = 'Tentar novamente as 3 narrações';
+  } finally {
+    generateReelVoicesButton.disabled = false;
+  }
+});
+
 </script>
 </body>
 </html>
