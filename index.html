@@ -161,13 +161,37 @@ html[data-theme="gold"] .ico{background:#d7b45a12;border-color:#d7b45a33}
  .history-details summary{padding:12px}
 }
 
+
+
+/* AXO account / login */
+.nav-auth{font-size:13px;padding:10px 15px;white-space:nowrap;cursor:pointer}
+.auth-dialog{width:min(440px,calc(100% - 28px));max-width:440px;max-height:calc(100dvh - 28px);padding:0;border:1px solid #4d3e21;border-radius:20px;background:#0c0c0c;color:#f7f5ef;box-shadow:0 24px 90px #000b;overflow:auto}
+.auth-dialog::backdrop{background:rgba(0,0,0,.78);backdrop-filter:blur(7px)}
+.auth-shell{padding:24px}.auth-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:10px}
+.auth-top h2{font-size:25px;line-height:1.2;margin:5px 0 0;letter-spacing:-.6px}
+.auth-close{width:36px;height:36px;border:1px solid #35302a;border-radius:50%;background:#151515;color:#f6f3eb;font-size:25px;line-height:1;cursor:pointer}
+.auth-intro{font-size:13px;color:#c4c0b7;line-height:1.6;margin:12px 0 18px}
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:5px;background:#151515;padding:5px;border:1px solid #29251d;border-radius:12px;margin:18px 0}
+.auth-tab{border:1px solid transparent;border-radius:8px;background:transparent;color:#bcb8ae;padding:10px 5px;font:inherit;font-size:11px;font-weight:750;cursor:pointer}
+.auth-tab.is-active{background:#262012;border-color:#755d2a;color:#f1d68b}
+.auth-field{margin:14px 0}.auth-field label{display:block;font-size:12px;color:#e3dece;margin-bottom:7px}
+.auth-field input{width:100%;min-height:46px;border:1px solid #39352d;border-radius:11px;padding:12px;background:#111;color:#fff;font:inherit;font-size:14px}
+.auth-field input:focus{outline:2px solid #d7b45a;outline-offset:1px;border-color:#d7b45a}
+.auth-notice{padding:14px;border:1px solid #675126;background:#1a160d;border-radius:12px;font-size:13px;line-height:1.6;color:#ede3c9}
+.auth-notice p{margin:8px 0}.auth-notice a{color:#f1d68b;font-weight:750;text-decoration:underline}
+.auth-user{text-align:center;padding:24px 0 8px}.auth-user-check{display:grid;place-items:center;margin:0 auto 12px;width:44px;height:44px;border-radius:50%;background:#292216;color:#e7c873;font-size:24px}
+.auth-user p{font-size:13px;color:#bbb5a7;margin:0 0 6px}.auth-user strong{display:block;overflow-wrap:anywhere;margin-bottom:20px}
+.auth-feedback{min-height:18px;margin:12px 0 0;color:#e8cc7a;font-size:12px;line-height:1.5}.auth-feedback.error{color:#ffaaa4}
+.auth-small{font-size:10px;line-height:1.55;color:#8f8a80;margin:14px 0 0}.auth-dialog [hidden]{display:none!important}
+@media(max-width:600px){.navlinks{gap:10px}.nav-auth{padding:9px 11px}.auth-shell{padding:19px}.auth-top h2{font-size:23px}}
+
 </style>
 </head>
 <body>
 <header class="wrap">
  <nav class="nav">
   <a class="brand" href="#inicio" aria-label="AXO Studio AI início"><img class="brand-image" src="assets/axo-logo.svg" alt="AXO Studio AI"></a>
-  <div class="navlinks"><a href="#recursos">Recursos</a><a href="#como-funciona">Como funciona</a><a href="#perguntas">Dúvidas</a><a class="btn navcta" href="#gerador">Testar gerador ↗</a></div>
+  <div class="navlinks"><a href="#recursos">Recursos</a><a href="#como-funciona">Como funciona</a><a href="#perguntas">Dúvidas</a><button class="btn secondary nav-auth" type="button" id="authOpenBtn">Entrar</button><a class="btn navcta" href="#gerador">Testar gerador ↗</a></div>
  </nav>
  <div class="theme-toolbar" aria-label="Personalização das cores">
   <label for="themeSelect">Cores do site</label>
@@ -180,6 +204,19 @@ html[data-theme="gold"] .ico{background:#d7b45a12;border-color:#d7b45a33}
   <span class="theme-note" id="themeStatus" aria-live="polite">Tema salvo neste navegador</span>
  </div>
 </header>
+<dialog class="auth-dialog" id="authDialog" aria-labelledby="authTitle">
+ <div class="auth-shell">
+  <div class="auth-top"><div><span class="kicker">AXO ACCOUNT</span><h2 id="authTitle">Sua conta AXO</h2></div><button type="button" class="auth-close" id="authCloseBtn" aria-label="Fechar login">×</button></div>
+  <p class="auth-intro" id="authIntro">Entre ou crie sua conta para usar a geração de campanhas e narração por IA.</p>
+  <div class="auth-notice" id="authSetupNotice" hidden><strong>Falta conectar o serviço de login.</strong><p>O visual e os formulários já estão preparados, mas a autenticação só será ativada depois de conectar um projeto Supabase e configurar as variáveis do Worker.</p><a href="https://supabase.com/dashboard" target="_blank" rel="noopener noreferrer">Abrir Supabase ↗</a><p class="auth-small">Siga o guia de configuração no repositório. Não envie senhas nem chaves privadas pelo chat.</p></div>
+  <div id="authControls">
+   <div class="auth-tabs" role="tablist" aria-label="Opções de acesso"><button type="button" class="auth-tab is-active" data-auth-mode="signin" role="tab" aria-selected="true">Entrar</button><button type="button" class="auth-tab" data-auth-mode="signup" role="tab" aria-selected="false">Criar conta</button><button type="button" class="auth-tab" data-auth-mode="recover" role="tab" aria-selected="false">Recuperar senha</button></div>
+   <form id="authForm"><div class="auth-field" id="authEmailGroup"><label for="authEmail">E-mail</label><input id="authEmail" type="email" autocomplete="email" maxlength="254" placeholder="voce@exemplo.com" required></div><div class="auth-field" id="authPasswordGroup"><label for="authPassword" id="authPasswordLabel">Senha</label><input id="authPassword" type="password" autocomplete="current-password" minlength="8" maxlength="128" placeholder="Mínimo de 8 caracteres" required></div><button type="submit" class="btn full" id="authSubmitBtn">Entrar</button></form>
+  </div>
+  <div class="auth-user" id="authUserPanel" hidden><span class="auth-user-check">✓</span><p>Você está conectado como</p><strong id="authUserEmail"></strong><button type="button" class="btn secondary full" id="authLogoutBtn">Sair da conta</button></div>
+  <p class="auth-feedback" id="authFeedback" aria-live="polite" role="status"></p><p class="auth-small">Sua senha é gerenciada pelo provedor de autenticação e não é armazenada no código do site.</p>
+ </div>
+</dialog>
 <main>
 <section class="wrap hero" id="inicio">
  <div>
@@ -250,6 +287,8 @@ html[data-theme="gold"] .ico{background:#d7b45a12;border-color:#d7b45a33}
 <section class="wrap section"><div class="cta"><div class="kicker">AXO STUDIO AI</div><h2>Boas campanhas começam com uma boa ideia.</h2><p>Experimente o gerador e construa seu próximo conceito publicitário.</p><a class="btn" href="#gerador">Começar gratuitamente →</a></div></section>
 </main>
 <footer><div class="wrap foot"><span>© <span id="year"></span> AXO Studio AI. Todos os direitos reservados.</span><span>Uma primeira versão em evolução · <a href="#gerador">Testar gerador</a></span></div></footer>
+<script src="auth-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $ = id => document.getElementById(id);
 $('year').textContent = new Date().getFullYear();
@@ -286,6 +325,184 @@ applyTheme(savedTheme, false);
 $('themeSelect').addEventListener('change', function () {
   applyTheme($('themeSelect').value, true);
 });
+
+
+// AXO account: Supabase Auth (email/password) with persisted sessions.
+const AXO_AUTH_SETTINGS = window.AXO_AUTH_CONFIG || {};
+let authClient = null;
+let currentAuthSession = null;
+let currentAuthMode = 'signin';
+const authDialog = $('authDialog');
+const authOpenButton = $('authOpenBtn');
+const authFeedback = $('authFeedback');
+
+function hasAuthConfiguration() {
+  if (!window.supabase || typeof window.supabase.createClient !== 'function') return false;
+  const url = String(AXO_AUTH_SETTINGS.projectUrl || '').trim();
+  const key = String(AXO_AUTH_SETTINGS.publishableKey || '').trim();
+  try {
+    return new URL(url).protocol === 'https:' && url.length > 16 && key.length >= 20 &&
+      !/YOUR_|PASTE_|PLACEHOLDER/i.test(url + key);
+  } catch (err) { return false; }
+}
+if (hasAuthConfiguration()) {
+  authClient = window.supabase.createClient(
+    AXO_AUTH_SETTINGS.projectUrl.trim().replace(/\/$/, ''),
+    AXO_AUTH_SETTINGS.publishableKey.trim(),
+    { auth: { autoRefreshToken: true, persistSession: true, detectSessionInUrl: true } }
+  );
+}
+function setAuthFeedback(message, isError) {
+  authFeedback.textContent = message || '';
+  authFeedback.classList.toggle('error', Boolean(isError));
+}
+function setAuthMode(mode) {
+  currentAuthMode = ['signin','signup','recover','newpassword'].includes(mode) ? mode : 'signin';
+  const isRecover = currentAuthMode === 'recover';
+  const isNewPassword = currentAuthMode === 'newpassword';
+  const isSignup = currentAuthMode === 'signup';
+  $('authEmailGroup').hidden = isNewPassword;
+  $('authEmail').required = !isNewPassword;
+  $('authPasswordGroup').hidden = isRecover;
+  $('authPassword').required = !isRecover;
+  $('authPassword').autocomplete = isSignup || isNewPassword ? 'new-password' : 'current-password';
+  $('authPasswordLabel').textContent = isNewPassword ? 'Nova senha' : 'Senha';
+  $('authPassword').placeholder = isSignup || isNewPassword ? 'Use pelo menos 8 caracteres' : 'Sua senha';
+  $('authSubmitBtn').textContent = isRecover ? 'Enviar link de recuperação' : isNewPassword ? 'Salvar nova senha' : isSignup ? 'Criar minha conta' : 'Entrar';
+  document.querySelectorAll('[data-auth-mode]').forEach(function (tab) {
+    const active = tab.dataset.authMode === currentAuthMode;
+    tab.classList.toggle('is-active', active);
+    tab.setAttribute('aria-selected', active ? 'true' : 'false');
+  });
+  setAuthFeedback('');
+}
+function syncAuthInterface(session) {
+  currentAuthSession = session || null;
+  const hasSession = Boolean(currentAuthSession && currentAuthSession.access_token && currentAuthSession.user);
+  const configured = Boolean(authClient);
+  $('authSetupNotice').hidden = configured;
+  $('authControls').hidden = !configured || hasSession;
+  $('authUserPanel').hidden = !hasSession;
+  $('authIntro').textContent = !configured
+    ? 'O acesso por conta será ativado depois de conectar o provedor de autenticação.'
+    : hasSession ? 'Sua sessão está ativa neste navegador.' : 'Entre ou crie sua conta para usar a geração de campanhas e narração por IA.';
+  authOpenButton.textContent = hasSession ? 'Minha conta' : 'Entrar';
+  if (hasSession) $('authUserEmail').textContent = currentAuthSession.user.email || 'Conta AXO';
+}
+function openAuthDialog(mode) {
+  setAuthMode(mode || 'signin');
+  syncAuthInterface(currentAuthSession);
+  if (!authDialog.open) {
+    if (typeof authDialog.showModal === 'function') authDialog.showModal();
+    else authDialog.setAttribute('open', '');
+  }
+  if (!authClient) setAuthFeedback('Siga o guia de configuração para ativar o login.', true);
+}
+authOpenButton.addEventListener('click', function () { openAuthDialog('signin'); });
+$('authCloseBtn').addEventListener('click', function () {
+  if (typeof authDialog.close === 'function') authDialog.close(); else authDialog.removeAttribute('open');
+});
+authDialog.addEventListener('click', function (event) {
+  if (event.target === authDialog) {
+    if (typeof authDialog.close === 'function') authDialog.close(); else authDialog.removeAttribute('open');
+  }
+});
+document.querySelectorAll('[data-auth-mode]').forEach(function (tab) {
+  tab.addEventListener('click', function () { setAuthMode(tab.dataset.authMode); });
+});
+async function requireAuthSession() {
+  if (!authClient) {
+    openAuthDialog('signin');
+    setAuthFeedback('O login ainda precisa ser conectado ao Supabase. Consulte o guia de configuração.', true);
+    return null;
+  }
+  try {
+    const result = await authClient.auth.getSession();
+    if (result.error) throw result.error;
+    const session = result.data && result.data.session;
+    if (session && session.access_token) { syncAuthInterface(session); return session; }
+  } catch (err) { setAuthFeedback('Não foi possível conferir sua sessão. Entre novamente.', true); }
+  openAuthDialog('signin');
+  setAuthFeedback('Entre na sua conta AXO para continuar.', false);
+  return null;
+}
+$('authForm').addEventListener('submit', async function (event) {
+  event.preventDefault();
+  if (!authClient) {
+    setAuthFeedback('Login indisponível até o projeto Supabase ser configurado.', true);
+    return;
+  }
+  const email = $('authEmail').value.trim();
+  const password = $('authPassword').value;
+  const button = $('authSubmitBtn');
+  button.disabled = true;
+  setAuthFeedback('');
+  try {
+    let result;
+    if (currentAuthMode === 'signup') {
+      result = await authClient.auth.signUp({
+        email, password,
+        options: { emailRedirectTo: window.location.href.split('#')[0] }
+      });
+      if (result.error) throw result.error;
+      if (result.data && result.data.session) {
+        syncAuthInterface(result.data.session);
+        setAuthFeedback('Conta criada e sessão iniciada.');
+      } else {
+        setAuthFeedback('Confira seu e-mail para confirmar o cadastro e depois entre na sua conta.');
+      }
+    } else if (currentAuthMode === 'recover') {
+      result = await authClient.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.href.split('#')[0]
+      });
+      if (result.error) throw result.error;
+      setAuthFeedback('Se o e-mail estiver cadastrado, você receberá um link para recuperar a senha.');
+    } else if (currentAuthMode === 'newpassword') {
+      if (password.length < 8) throw new Error('A nova senha precisa ter pelo menos 8 caracteres.');
+      result = await authClient.auth.updateUser({ password });
+      if (result.error) throw result.error;
+      setAuthMode('signin');
+      $('authPassword').value = '';
+      setAuthFeedback('Senha atualizada. Você já pode continuar no AXO.');
+    } else {
+      result = await authClient.auth.signInWithPassword({ email, password });
+      if (result.error) throw result.error;
+      syncAuthInterface(result.data.session);
+      setAuthFeedback('Login realizado com sucesso.');
+    }
+  } catch (err) {
+    setAuthFeedback(err && err.message ? err.message : 'Não foi possível concluir o acesso.', true);
+  } finally {
+    button.disabled = false;
+    setAuthMode(currentAuthMode);
+  }
+});
+$('authLogoutBtn').addEventListener('click', async function () {
+  if (!authClient) return;
+  $('authLogoutBtn').disabled = true;
+  try {
+    const result = await authClient.auth.signOut();
+    if (result.error) throw result.error;
+    syncAuthInterface(null);
+    setAuthMode('signin');
+    setAuthFeedback('Você saiu da sua conta.');
+  } catch (err) {
+    setAuthFeedback('Não foi possível sair agora. Tente novamente.', true);
+  } finally { $('authLogoutBtn').disabled = false; }
+});
+if (authClient) {
+  authClient.auth.onAuthStateChange(function (event, session) {
+    syncAuthInterface(session);
+    if (event === 'PASSWORD_RECOVERY') {
+      openAuthDialog('newpassword');
+      setAuthFeedback('Crie sua nova senha abaixo.');
+    }
+  });
+  authClient.auth.getSession().then(function (result) {
+    if (!result.error) syncAuthInterface(result.data.session);
+  }).catch(function () { syncAuthInterface(null); });
+} else { syncAuthInterface(null); }
+setAuthMode('signin');
 
 const HISTORY_STORAGE_KEY = 'axoStudioCampaignHistoryV1';
 const HISTORY_LIMIT = 10;
