@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://chebensonsaintcyr-svg.github.io/axo-studio-ai/sitemap.xml
