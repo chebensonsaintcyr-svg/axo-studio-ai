@@ -130,7 +130,7 @@ for (const fragment of [
   "localStorage.getItem(scopedStorageKey(HISTORY_STORAGE_KEY))",
   'id="themeSelect"',
   "function applyTheme",
-  "localStorage.setItem(THEME_STORAGE_KEY",
+  "localStorage.setItem(scopedStorageKey(THEME_STORAGE_KEY)",
   'value="silver"',
   'value="purple"',
   'value="light"',
