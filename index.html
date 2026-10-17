@@ -316,7 +316,7 @@ function renderCampaign(d, c, fromHistory) {
       <p class="tiny" id="commonsCount">Quando disponíveis, até 3 opções serão marcadas para começar; você pode alterar a seleção.</p>
     </div>
     <div class="field" style="margin-top:18px"><label for="videoImages">Ou adicione suas próprias fotos (opcional, até 4 no total)</label><input id="videoImages" type="file" accept="image/*" multiple><p class="tiny">As fotos escolhidas no seu computador ficam no navegador. O total de imagens por vídeo é 4.</p></div>
-    <div class="output-actions"><button type="button" class="btn" id="videoBtn">🎬 Gerar vídeo vertical com voz</button><button type="button" class="btn secondary" id="copyBtn">Copiar campanha</button><button type="button" class="btn secondary" id="downloadBtn">Baixar .txt</button></div>` +
+    <div class="output-actions"><button type="button" class="btn" id="videoBtn">🎬 Gerar vídeo vertical com voz</button><button type="button" class="btn secondary" id="copyBtn">Copiar campanha</button><button type="button" class="btn secondary" id="downloadBtn">Baixar .txt</button><button type="button" class="btn secondary" id="whatsappBtn">Compartilhar no WhatsApp</button></div>` +
     '<p class="notice">O vídeo usa fotos selecionadas, narração por IA e identidade visual AXO. Confira as licenças e atribuições no painel antes de usar imagens em anúncios comerciais.</p>';
 
   $('empty').classList.add('hidden');
@@ -351,6 +351,12 @@ function renderCampaign(d, c, fromHistory) {
     link.download = 'axo-campanha.txt';
     link.click();
     URL.revokeObjectURL(url);
+  });
+
+  $('whatsappBtn').addEventListener('click', function () {
+    const campaignText = toCampaignText(d, c);
+    const whatsappUrl = 'https://wa.me/?text=' + encodeURIComponent(campaignText);
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
   });
 
   let commonsResults = [];
