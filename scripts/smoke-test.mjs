@@ -128,7 +128,9 @@ for (const fragment of [
   "const AXO_REEL_VOICE_REQUESTS",
   "const AXO_REEL_MALE_ENERGETIC_STYLE",
   "voice: 'Fenrir'",
-  "Generate the three approved AXO Reel voiceovers",
+  "Generate only missing AXO Reel voiceovers",
+  "As narrações prontas serão preservadas.",
+  "Clique novamente para gerar somente as que faltam.",
   "Nada foi publicado ou agendado.",
   "No second voice, dialogue, chorus, echo",
   "if (suppliedAudioBase64)",
@@ -179,6 +181,9 @@ report("Critical features, unique IDs, balanced script tags, and no exposed API-
 assert.equal((html.match(/id="reelVoicePlayer[012]"/g) || []).length, 3, "The Reel voice studio should contain exactly three preview players.");
 assert.equal((html.match(/id="reelVoiceDownload[012]"/g) || []).length, 3, "The Reel voice studio should expose one download per generated narration.");
 assert.ok(html.includes("voice: 'Fenrir'"), "Reel voice generation should use the selected masculine-coded voice.");
+assert.ok(html.includes(".filter(function (item) { return !axoReelVoiceUrls[item.index]; })"), "Retry should skip completed audio tracks and avoid duplicate paid generation requests.");
+assert.ok(html.includes("As narrações prontas serão preservadas."), "The UI should explain that completed audio is retained after partial failure.");
+assert.ok(html.includes("try {\n    const session = await requireAuthSession();"), "Auth lookup should be inside try/finally so the generate button is restored if auth fails.");
 assert.ok(html.includes("Energetic solo male voice in natural Brazilian Portuguese"), "Reel voice generation should request an energetic Brazilian Portuguese male style.");
 assert.ok(setupLoginSource.includes("2 e-mails por hora"), "Login setup guide should explain the Supabase built-in email quota.");
 assert.ok(setupLoginSource.includes("Authentication → Emails → SMTP Settings"), "Login setup guide should identify where to configure custom SMTP.");
