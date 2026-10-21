@@ -1700,7 +1700,7 @@ $('campaignForm').addEventListener('submit', async function (event) {
   }
 });
 
-/* Generate the three approved AXO Reel voiceovers through the existing authenticated Gemini TTS Worker. */
+/* Generate only missing AXO Reel voiceovers. Completed previews stay available after a partial failure. */
 const AXO_REEL_VOICE_REQUESTS = [
   {
     text: 'Travou na hora de criar conteúdo para o seu negócio? Você não precisa começar do zero. Com a AXO Studio AI, transforme sua ideia em roteiro, legenda e plano de cenas. Experimente grátis no link da bio.',
@@ -1720,18 +1720,40 @@ let axoReelVoiceUrls = ['', '', ''];
 const generateReelVoicesButton = $('generateReelVoicesBtn');
 const reelVoiceStatus = $('reelVoiceStatus');
 
+function setReelVoicePreview(index, url) {
+  const player = $('reelVoicePlayer' + index);
+  const download = $('reelVoiceDownload' + index);
+  player.src = url;
+  player.hidden = false;
+  download.href = url;
+  download.download = AXO_REEL_VOICE_REQUESTS[index].filename;
+  download.hidden = false;
+}
+
 generateReelVoicesButton.addEventListener('click', async function () {
   generateReelVoicesButton.disabled = true;
-  const session = await requireAuthSession();
-  if (!session || !session.access_token) {
-    generateReelVoicesButton.disabled = false;
-    return;
-  }
-
-  generateReelVoicesButton.textContent = 'Gerando as narrações...';
-  reelVoiceStatus.textContent = 'Preparando a primeira faixa. Aguarde enquanto o AXO gera as três vozes.';
+  const originalLabel = generateReelVoicesButton.textContent;
+  let generatedCount = 0;
   try {
-    for (let i = 0; i < AXO_REEL_VOICE_REQUESTS.length; i++) {
+    const session = await requireAuthSession();
+    if (!session || !session.access_token) {
+      reelVoiceStatus.textContent = 'Entre na sua conta para gerar as narrações.';
+      return;
+    }
+
+    const missing = AXO_REEL_VOICE_REQUESTS
+      .map(function (request, index) { return {request, index}; })
+      .filter(function (item) { return !axoReelVoiceUrls[item.index]; });
+
+    if (!missing.length) {
+      reelVoiceStatus.textContent = 'As três narrações já estão prontas nesta sessão. Baixe ou ouça as faixas acima; atualize a página somente se quiser gerar novas versões.';
+      return;
+    }
+
+    generateReelVoicesButton.textContent = 'Gerando faixas pendentes...';
+    reelVoiceStatus.textContent = 'Serão geradas apenas ' + missing.length + ' faixa(s) pendente(s). As narrações prontas serão preservadas.';
+    for (const item of missing) {
+      const i = item.index;
       reelVoiceStatus.textContent = 'Gerando narração ' + (i + 1) + ' de 3...';
       const response = await fetch('https://axo-studio-ai-api.chebensonsaintcyr.workers.dev/', {
         method: 'POST',
@@ -1741,7 +1763,7 @@ generateReelVoicesButton.addEventListener('click', async function () {
         },
         body: JSON.stringify({
           action: 'speech',
-          text: AXO_REEL_VOICE_REQUESTS[i].text,
+          text: item.request.text,
           voice: 'Fenrir',
           style: AXO_REEL_MALE_ENERGETIC_STYLE
         })
@@ -1750,33 +1772,39 @@ generateReelVoicesButton.addEventListener('click', async function () {
       try { data = await response.json(); }
       catch (err) { throw new Error('O serviço de voz retornou uma resposta inválida.'); }
       if (!response.ok) {
-        throw new Error(data && data.error ? data.error : 'Não foi possível gerar a narração ' + (i + 1) + '.');
+        throw new Error(data && data.error ? data.error : 'Não foi possível gerar a narração ' + (i + 1) + ' (' + response.status + ').');
       }
       if (!data || !data.audioBase64) throw new Error('A narração ' + (i + 1) + ' veio sem áudio.');
-      const binary = atob(data.audioBase64);
+
+      let binary;
+      try { binary = atob(data.audioBase64); }
+      catch (err) { throw new Error('O serviço retornou áudio inválido na narração ' + (i + 1) + '.'); }
       const bytes = new Uint8Array(binary.length);
       for (let j = 0; j < binary.length; j++) bytes[j] = binary.charCodeAt(j);
       const audioBlob = new Blob([bytes], {type: data.mimeType || 'audio/wav'});
       if (!audioBlob.size) throw new Error('A narração ' + (i + 1) + ' veio vazia.');
 
+      const newUrl = URL.createObjectURL(audioBlob);
       if (axoReelVoiceUrls[i]) URL.revokeObjectURL(axoReelVoiceUrls[i]);
-      axoReelVoiceUrls[i] = URL.createObjectURL(audioBlob);
-      const player = $('reelVoicePlayer' + i);
-      player.src = axoReelVoiceUrls[i];
-      player.hidden = false;
-      const download = $('reelVoiceDownload' + i);
-      download.href = axoReelVoiceUrls[i];
-      download.download = AXO_REEL_VOICE_REQUESTS[i].filename;
-      download.hidden = false;
+      axoReelVoiceUrls[i] = newUrl;
+      setReelVoicePreview(i, newUrl);
+      generatedCount++;
     }
-    reelVoiceStatus.textContent = 'As três narrações foram geradas. Ouça cada faixa e baixe os WAVs para enviá-los nesta conversa. Nada foi publicado ou agendado.';
-    generateReelVoicesButton.textContent = 'Gerar novamente as 3 narrações';
+
+    reelVoiceStatus.textContent = 'As três narrações estão prontas. Ouça cada faixa e baixe os arquivos para revisão. Nada foi publicado ou agendado.';
+    generateReelVoicesButton.textContent = 'Verificar narrações';
   } catch (err) {
-    reelVoiceStatus.textContent = (err && err.message ? err.message : 'Não foi possível terminar as narrações.') +
-      ' Os arquivos que já foram gerados continuam disponíveis para ouvir e baixar.';
-    generateReelVoicesButton.textContent = 'Tentar novamente as 3 narrações';
+    const message = err && err.message ? err.message : 'Não foi possível terminar as narrações.';
+    reelVoiceStatus.textContent = message + ' ' +
+      (generatedCount
+        ? 'As novas faixas concluídas e as faixas anteriores continuam disponíveis. Clique novamente para gerar somente as que faltam.'
+        : 'As faixas já prontas foram preservadas. Clique novamente para tentar apenas as que faltam.');
+    generateReelVoicesButton.textContent = 'Tentar faixas pendentes';
   } finally {
     generateReelVoicesButton.disabled = false;
+    if (generateReelVoicesButton.textContent === 'Gerando faixas pendentes...') {
+      generateReelVoicesButton.textContent = originalLabel;
+    }
   }
 });
 
