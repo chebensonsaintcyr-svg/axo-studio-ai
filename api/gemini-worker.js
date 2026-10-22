@@ -224,7 +224,8 @@ export default {
         return jsonResponse({ error: "A voz IA não retornou áudio. Tente novamente." }, 502, origin);
       }
 
-      return jsonResponse({ audioBase64, mimeType: "audio/wav" }, 200, origin);
+      const mimeType = cleanString(audioPart?.mime_type || audioPart?.mimeType || speechData?.output_audio?.mime_type || "audio/wav", 80);
+      return jsonResponse({ audioBase64, mimeType }, 200, origin);
     }
 
     const business = cleanString(input.business, 90);
