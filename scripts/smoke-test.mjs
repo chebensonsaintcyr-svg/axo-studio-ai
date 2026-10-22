@@ -130,7 +130,7 @@ for (const fragment of [
   "voice: 'Fenrir'",
   "Generate the three approved AXO Reel voiceovers",
   "Nada foi publicado ou agendado.",
-  "No second voice, dialogue, chorus, echo",
+  "Não crie diálogo, segunda voz, coro, eco, reverberação, música ou efeitos sonoros.",
   "if (suppliedAudioBase64)",
   "O vídeo usará exatamente esta faixa de áudio, sem gerar uma segunda voz.",
   "searchCommonsImages(d.product, true)",
