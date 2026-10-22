@@ -717,11 +717,33 @@ function toCampaignText(d, c) {
 }
 
 function showError(message) {
-  $('empty').classList.add('hidden');
-  $('results').classList.remove('hidden');
-  $('results').innerHTML = '<div class="ico" style="margin-bottom:14px">!</div><h3>Não foi possível concluir</h3><p>' +
-    esc(message || 'Ocorreu um erro. Tente novamente em instantes.') +
-    '</p><p class="notice">Confira o login da sua conta e se o Worker está publicado com as variáveis de autenticação e a chave de IA configuradas.</p>';
+  const results = $('results');
+  const empty = $('empty');
+  const text = message || 'Ocorreu um erro. Tente novamente em instantes.';
+
+  // Do not destroy the generated campaign/video controls when an operation fails.
+  // Replacing results.innerHTML here removed the video button and made the page
+  // appear to jump back to the beginning after a video-generation error.
+  if (results && !results.classList.contains('hidden')) {
+    let notice = $('axoGenerationError');
+    if (!notice) {
+      notice = document.createElement('div');
+      notice.id = 'axoGenerationError';
+      notice.className = 'notice';
+      notice.setAttribute('role', 'alert');
+      notice.style.cssText = 'border:1px solid #b94a48;padding:12px 14px;margin:12px 0;border-radius:12px;color:#ffd7d7;background:rgba(185,74,72,.12)';
+      results.prepend(notice);
+    }
+    notice.textContent = 'Não foi possível concluir: ' + text;
+    notice.scrollIntoView({behavior:'smooth', block:'nearest'});
+    return;
+  }
+
+  if (empty) {
+    empty.classList.remove('hidden');
+    empty.textContent = 'Não foi possível concluir: ' + text +
+      ' Confira o login da sua conta e se o serviço de IA está configurado.';
+  }
 }
 
 function plainMeta(value) {
@@ -757,7 +779,7 @@ function buildCommonsCredit(item) {
   return [item.title ? item.title.replace(/^File:/, '') : '', item.author ? 'por ' + item.author : '', item.license || 'Licença: verificar', item.descriptionUrl || ''].filter(Boolean).join(' — ');
 }
 
-const AXO_SINGLE_VOICE_STYLE = "One solo speaker; natural Brazilian Portuguese, warm clear voice at steady medium pace. Read this script once. No second voice, dialogue, chorus, echo, music or sound effects.";
+const AXO_SINGLE_VOICE_STYLE = "Leia o texto inteiro uma única vez em português brasileiro natural. Uma única voz masculina adulta, clara, confiante e acolhedora, ritmo médio e constante, dicção nítida, sem acelerar no final. Não repita frases nem palavras. Não crie diálogo, segunda voz, coro, eco, reverberação, música ou efeitos sonoros. Entregue somente a narração falada, com pausas naturais entre frases.";
 
 function renderCampaign(d, c, fromHistory) {
   if (!c || !c.hook || !c.script || !c.caption || !Array.isArray(c.scenes)) {
@@ -1715,7 +1737,7 @@ const AXO_REEL_VOICE_REQUESTS = [
     filename: 'axo-reel-03-voz-masculina.wav'
   }
 ];
-const AXO_REEL_MALE_ENERGETIC_STYLE = 'Energetic solo male voice in natural Brazilian Portuguese; confident, upbeat, clear articulation, medium-fast pace, lively intonation. No music, echo, chorus or extra voices.';
+const AXO_REEL_MALE_ENERGETIC_STYLE = 'Leia somente o texto desta faixa, uma única vez, em português brasileiro natural. Voz masculina solo, jovem-adulta, energética e confiante, dicção clara, ritmo médio para rápido sem atropelar palavras, entonação viva e volume estável. Não leia instruções. Não acrescente introdução, comentários ou frases. Não repita palavras ou frases. Sem música, eco, reverberação, coro, diálogo ou vozes extras. Cada pedido deve gerar apenas a narração correspondente a este Reel.';
 let axoReelVoiceUrls = ['', '', ''];
 const generateReelVoicesButton = $('generateReelVoicesBtn');
 const reelVoiceStatus = $('reelVoiceStatus');
