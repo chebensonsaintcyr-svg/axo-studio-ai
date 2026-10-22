@@ -1199,13 +1199,30 @@ function renderCampaign(d, c, fromHistory) {
   const approveVoiceCheckbox = $('approveVoiceCheckbox');
   const videoButton = $('videoBtn');
 
-  approveVoiceCheckbox.addEventListener('change', function () {
-    const approved = Boolean(this.checked && preparedAudioBase64);
+  function updateVoiceApproval() {
+    const approved = Boolean(approveVoiceCheckbox.checked && preparedAudioBase64 && previewPlayer.readyState >= 1);
     videoButton.disabled = !approved;
     videoButton.textContent = approved ? '🎬 Gerar vídeo vertical com voz' : '🔒 Ouça e aprove a narração para continuar';
     previewStatus.textContent = approved
-      ? '✓ Narração aprovada. O vídeo usará exatamente esta faixa de áudio, sem gerar uma segunda voz.'
-      : 'Escute a narração e marque a confirmação para liberar o vídeo.';
+      ? '✓ Narração aprovada. O vídeo usará exatamente esta faixa de áudio.'
+      : 'Ouça a faixa e marque a caixa para liberar o vídeo.';
+  }
+  approveVoiceCheckbox.addEventListener('change', updateVoiceApproval);
+  previewPlayer.addEventListener('loadedmetadata', function () {
+    if (preparedAudioBase64) {
+      approveVoiceCheckbox.disabled = false;
+      previewStatus.textContent = 'Áudio carregado. Toque em reproduzir; depois confirme a aprovação.';
+    }
+    updateVoiceApproval();
+  });
+  previewPlayer.addEventListener('error', function () {
+    approveVoiceCheckbox.checked = false;
+    approveVoiceCheckbox.disabled = true;
+    videoButton.disabled = true;
+    previewStatus.textContent = 'O áudio foi gerado, mas o navegador não conseguiu reproduzi-lo. Gere novamente ou tente no Chrome.';
+  });
+  previewPlayer.addEventListener('playing', function () {
+    previewStatus.textContent = 'Narração em reprodução. Depois de ouvir, marque a caixa de aprovação.';
   });
 
   async function prepareAndPreviewVoice() {
@@ -1247,13 +1264,15 @@ function renderCampaign(d, c, fromHistory) {
       previewPlayer.src = previewObjectUrl;
       previewPlayer.style.display = 'block';
       previewPlayer.load();
+      previewPlayer.style.pointerEvents = 'auto';
+      previewPlayer.controls = true;
       approveVoiceCheckbox.checked = false;
       approveVoiceCheckbox.disabled = false;
       videoButton.disabled = true;
       videoButton.textContent = '🔒 Ouça e aprove a narração para continuar';
       previewStatus.textContent = 'Ouça a faixa abaixo. Depois marque a confirmação para liberar o vídeo.';
       previewPlayer.play().catch(function () {
-        previewStatus.textContent = 'Narração pronta. Toque em reproduzir no player para ouvir.';
+        previewStatus.textContent = 'Narração pronta. Use o player abaixo para tocar. Se aparecer erro, o formato do áudio pode não ser compatível.';
       });
       previewButton.textContent = '↻ Ouvir de novo';
     } catch (err) {
