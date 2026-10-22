@@ -132,7 +132,7 @@ for (const fragment of [
   "Nada foi publicado ou agendado.",
   "Não crie diálogo, segunda voz, coro, eco, reverberação, música ou efeitos sonoros.",
   "if (suppliedAudioBase64)",
-  "O vídeo usará exatamente esta faixa de áudio, sem gerar uma segunda voz.",
+  "✓ Narração aprovada. O vídeo usará exatamente esta faixa de áudio.",
   "searchCommonsImages(d.product, true)",
   "function buildCommonsCredit",
   "id=\"historyList\"",
