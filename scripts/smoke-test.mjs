@@ -184,7 +184,7 @@ assert.ok(setupLoginSource.includes("2 e-mails por hora"), "Login setup guide sh
 assert.ok(setupLoginSource.includes("Authentication → Emails → SMTP Settings"), "Login setup guide should identify where to configure custom SMTP.");
 assert.ok(setupLoginSource.includes("nunca no HTML, no GitHub"), "Login setup guide should warn against committing SMTP credentials.");
 report("Supabase email quota troubleshooting guide");
-assert.ok(html.includes("preparedAudioBase64 = data.audioBase64"), "Previewed narration should be cached for the final render.");
+assert.ok(html.includes("preparedAudioBase64 = btoa(normalizedBinary)"), "Prepared narration audio should be cached as base64 for the final render.");
 assert.ok(html.includes("generateVideo(d, c, $('videoBtn'), files, commonsImages, preparedAudioBase64, preparedAudioMimeType)"),
   "The video generator should use the exact audio clip the user previewed.");
 report("Video renderer uses cached scenes, a 24 fps cap, and AXO gold styling");
