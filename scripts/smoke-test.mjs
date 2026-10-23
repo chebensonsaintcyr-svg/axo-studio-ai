@@ -179,7 +179,7 @@ report("Critical features, unique IDs, balanced script tags, and no exposed API-
 assert.equal((html.match(/id="reelVoicePlayer[012]"/g) || []).length, 3, "The Reel voice studio should contain exactly three preview players.");
 assert.equal((html.match(/id="reelVoiceDownload[012]"/g) || []).length, 3, "The Reel voice studio should expose one download per generated narration.");
 assert.ok(html.includes("voice: 'Fenrir'"), "Reel voice generation should use the selected masculine-coded voice.");
-assert.ok(html.includes("Energetic solo male voice in natural Brazilian Portuguese"), "Reel voice generation should request an energetic Brazilian Portuguese male style.");
+assert.ok(html.includes("Leia somente o texto desta faixa, uma única vez, em português brasileiro natural. Voz masculina solo, jovem-adulta, energética e confiante"), "Reel voice generation should request an energetic Brazilian Portuguese male style.");
 assert.ok(setupLoginSource.includes("2 e-mails por hora"), "Login setup guide should explain the Supabase built-in email quota.");
 assert.ok(setupLoginSource.includes("Authentication → Emails → SMTP Settings"), "Login setup guide should identify where to configure custom SMTP.");
 assert.ok(setupLoginSource.includes("nunca no HTML, no GitHub"), "Login setup guide should warn against committing SMTP credentials.");
