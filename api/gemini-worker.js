@@ -162,7 +162,7 @@ export default {
       const requestedVoice = cleanString(input.voice, 32);
       const allowedVoices = new Set(["Kore", "Puck", "Charon", "Fenrir", "Aoede", "Leda", "Orus", "Zephyr"]);
       const voice = allowedVoices.has(requestedVoice) ? requestedVoice : "Kore";
-      const style = cleanString(input.style, 180) || "Warm, confident, clear advertising narration in natural Brazilian Portuguese, medium pace.";
+      const style = cleanString(input.style, 500) || "Warm, confident, clear advertising narration in natural Brazilian Portuguese, medium pace.";
       if (!speechText) {
         return jsonResponse({ error: "Não há texto para narrar." }, 400, origin);
       }
@@ -224,7 +224,8 @@ export default {
         return jsonResponse({ error: "A voz IA não retornou áudio. Tente novamente." }, 502, origin);
       }
 
-      return jsonResponse({ audioBase64, mimeType: "audio/wav" }, 200, origin);
+      const mimeType = cleanString(audioPart?.mime_type || audioPart?.mimeType || speechData?.output_audio?.mime_type || "audio/wav", 80);
+      return jsonResponse({ audioBase64, mimeType }, 200, origin);
     }
 
     const business = cleanString(input.business, 90);

@@ -717,11 +717,33 @@ function toCampaignText(d, c) {
 }
 
 function showError(message) {
-  $('empty').classList.add('hidden');
-  $('results').classList.remove('hidden');
-  $('results').innerHTML = '<div class="ico" style="margin-bottom:14px">!</div><h3>Não foi possível concluir</h3><p>' +
-    esc(message || 'Ocorreu um erro. Tente novamente em instantes.') +
-    '</p><p class="notice">Confira o login da sua conta e se o Worker está publicado com as variáveis de autenticação e a chave de IA configuradas.</p>';
+  const results = $('results');
+  const empty = $('empty');
+  const text = message || 'Ocorreu um erro. Tente novamente em instantes.';
+
+  // Do not destroy the generated campaign/video controls when an operation fails.
+  // Replacing results.innerHTML here removed the video button and made the page
+  // appear to jump back to the beginning after a video-generation error.
+  if (results && !results.classList.contains('hidden')) {
+    let notice = $('axoGenerationError');
+    if (!notice) {
+      notice = document.createElement('div');
+      notice.id = 'axoGenerationError';
+      notice.className = 'notice';
+      notice.setAttribute('role', 'alert');
+      notice.style.cssText = 'border:1px solid #b94a48;padding:12px 14px;margin:12px 0;border-radius:12px;color:#ffd7d7;background:rgba(185,74,72,.12)';
+      results.prepend(notice);
+    }
+    notice.textContent = 'Não foi possível concluir: ' + text;
+    notice.scrollIntoView({behavior:'smooth', block:'nearest'});
+    return;
+  }
+
+  if (empty) {
+    empty.classList.remove('hidden');
+    empty.textContent = 'Não foi possível concluir: ' + text +
+      ' Confira o login da sua conta e se o serviço de IA está configurado.';
+  }
 }
 
 function plainMeta(value) {
@@ -757,7 +779,7 @@ function buildCommonsCredit(item) {
   return [item.title ? item.title.replace(/^File:/, '') : '', item.author ? 'por ' + item.author : '', item.license || 'Licença: verificar', item.descriptionUrl || ''].filter(Boolean).join(' — ');
 }
 
-const AXO_SINGLE_VOICE_STYLE = "One solo speaker; natural Brazilian Portuguese, warm clear voice at steady medium pace. Read this script once. No second voice, dialogue, chorus, echo, music or sound effects.";
+const AXO_SINGLE_VOICE_STYLE = "Leia o texto inteiro uma única vez em português brasileiro natural. Uma única voz masculina adulta, clara, confiante e acolhedora, ritmo médio e constante, dicção nítida, sem acelerar no final. Não repita frases nem palavras. Não crie diálogo, segunda voz, coro, eco, reverberação, música ou efeitos sonoros. Entregue somente a narração falada, com pausas naturais entre frases.";
 
 function renderCampaign(d, c, fromHistory) {
   if (!c || !c.hook || !c.script || !c.caption || !Array.isArray(c.scenes)) {
@@ -1177,13 +1199,30 @@ function renderCampaign(d, c, fromHistory) {
   const approveVoiceCheckbox = $('approveVoiceCheckbox');
   const videoButton = $('videoBtn');
 
-  approveVoiceCheckbox.addEventListener('change', function () {
-    const approved = Boolean(this.checked && preparedAudioBase64);
+  function updateVoiceApproval() {
+    const approved = Boolean(approveVoiceCheckbox.checked && preparedAudioBase64 && previewPlayer.readyState >= 1);
     videoButton.disabled = !approved;
     videoButton.textContent = approved ? '🎬 Gerar vídeo vertical com voz' : '🔒 Ouça e aprove a narração para continuar';
     previewStatus.textContent = approved
-      ? '✓ Narração aprovada. O vídeo usará exatamente esta faixa de áudio, sem gerar uma segunda voz.'
-      : 'Escute a narração e marque a confirmação para liberar o vídeo.';
+      ? '✓ Narração aprovada. O vídeo usará exatamente esta faixa de áudio.'
+      : 'Ouça a faixa e marque a caixa para liberar o vídeo.';
+  }
+  approveVoiceCheckbox.addEventListener('change', updateVoiceApproval);
+  previewPlayer.addEventListener('loadedmetadata', function () {
+    if (preparedAudioBase64) {
+      approveVoiceCheckbox.disabled = false;
+      previewStatus.textContent = 'Áudio carregado. Toque em reproduzir; depois confirme a aprovação.';
+    }
+    updateVoiceApproval();
+  });
+  previewPlayer.addEventListener('error', function () {
+    approveVoiceCheckbox.checked = false;
+    approveVoiceCheckbox.disabled = true;
+    videoButton.disabled = true;
+    previewStatus.textContent = 'O áudio foi gerado, mas o navegador não conseguiu reproduzi-lo. Gere novamente ou tente no Chrome.';
+  });
+  previewPlayer.addEventListener('playing', function () {
+    previewStatus.textContent = 'Narração em reprodução. Depois de ouvir, marque a caixa de aprovação.';
   });
 
   async function prepareAndPreviewVoice() {
@@ -1214,24 +1253,57 @@ function renderCampaign(d, c, fromHistory) {
       catch (err) { throw new Error('O servidor de voz retornou uma resposta inválida.'); }
       if (!response.ok) throw new Error(data && data.error ? data.error : 'Não foi possível gerar a voz (' + response.status + ').');
       if (!data.audioBase64) throw new Error('O serviço não retornou uma narração. Tente novamente.');
-      preparedAudioBase64 = data.audioBase64;
-      preparedAudioMimeType = data.mimeType || 'audio/wav';
-      const binary = atob(preparedAudioBase64);
-      const bytes = new Uint8Array(binary.length);
+      const sourceMimeType = String(data.mimeType || '').toLowerCase();
+      const binary = atob(data.audioBase64);
+      let bytes = new Uint8Array(binary.length);
       for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+
+      // Gemini TTS may return raw 16-bit PCM (audio/L16), which browsers
+      // cannot play or decode directly. Wrap it in a standard WAV container.
+      if (sourceMimeType.includes('l16') || sourceMimeType.includes('pcm')) {
+        const sampleRate = 24000;
+        const wav = new ArrayBuffer(44 + bytes.length);
+        const view = new DataView(wav);
+        const writeAscii = function (offset, value) {
+          for (let j = 0; j < value.length; j++) view.setUint8(offset + j, value.charCodeAt(j));
+        };
+        writeAscii(0, 'RIFF');
+        view.setUint32(4, 36 + bytes.length, true);
+        writeAscii(8, 'WAVE');
+        writeAscii(12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, 1, true);
+        view.setUint16(22, 1, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * 2, true);
+        view.setUint16(32, 2, true);
+        view.setUint16(34, 16, true);
+        writeAscii(36, 'data');
+        view.setUint32(40, bytes.length, true);
+        new Uint8Array(wav, 44).set(bytes);
+        bytes = new Uint8Array(wav);
+        preparedAudioMimeType = 'audio/wav';
+      } else {
+        preparedAudioMimeType = data.mimeType || 'audio/wav';
+      }
+      let normalizedBinary = '';
+      for (let i = 0; i < bytes.length; i++) normalizedBinary += String.fromCharCode(bytes[i]);
+      preparedAudioBase64 = btoa(normalizedBinary);
       const audioBlob = new Blob([bytes], {type: preparedAudioMimeType});
       if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
       previewObjectUrl = URL.createObjectURL(audioBlob);
       previewPlayer.src = previewObjectUrl;
       previewPlayer.style.display = 'block';
       previewPlayer.load();
+      previewPlayer.style.pointerEvents = 'auto';
+      previewPlayer.controls = true;
       approveVoiceCheckbox.checked = false;
       approveVoiceCheckbox.disabled = false;
       videoButton.disabled = true;
       videoButton.textContent = '🔒 Ouça e aprove a narração para continuar';
       previewStatus.textContent = 'Ouça a faixa abaixo. Depois marque a confirmação para liberar o vídeo.';
       previewPlayer.play().catch(function () {
-        previewStatus.textContent = 'Narração pronta. Toque em reproduzir no player para ouvir.';
+        previewStatus.textContent = 'Narração pronta. Use o player abaixo para tocar. Se aparecer erro, o formato do áudio pode não ser compatível.';
       });
       previewButton.textContent = '↻ Ouvir de novo';
     } catch (err) {
@@ -1715,7 +1787,7 @@ const AXO_REEL_VOICE_REQUESTS = [
     filename: 'axo-reel-03-voz-masculina.wav'
   }
 ];
-const AXO_REEL_MALE_ENERGETIC_STYLE = 'Energetic solo male voice in natural Brazilian Portuguese; confident, upbeat, clear articulation, medium-fast pace, lively intonation. No music, echo, chorus or extra voices.';
+const AXO_REEL_MALE_ENERGETIC_STYLE = 'Leia somente o texto desta faixa, uma única vez, em português brasileiro natural. Voz masculina solo, jovem-adulta, energética e confiante, dicção clara, ritmo médio para rápido sem atropelar palavras, entonação viva e volume estável. Não leia instruções. Não acrescente introdução, comentários ou frases. Não repita palavras ou frases. Sem música, eco, reverberação, coro, diálogo ou vozes extras. Cada pedido deve gerar apenas a narração correspondente a este Reel.';
 let axoReelVoiceUrls = ['', '', ''];
 const generateReelVoicesButton = $('generateReelVoicesBtn');
 const reelVoiceStatus = $('reelVoiceStatus');
