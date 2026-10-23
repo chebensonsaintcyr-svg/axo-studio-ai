@@ -1201,8 +1201,8 @@ function renderCampaign(d, c, fromHistory) {
 
   function updateVoiceApproval() {
     const approved = Boolean(approveVoiceCheckbox.checked && preparedAudioBase64 && previewPlayer.readyState >= 1);
-    videoButton.disabled = !approved;
-    videoButton.textContent = approved ? '🎬 Gerar vídeo vertical com voz' : '🔒 Ouça e aprove a narração para continuar';
+    videoButton.disabled = false;
+    videoButton.textContent = approved ? '🎬 Gerar vídeo vertical com voz' : '🎬 Preparar narração e continuar';
     previewStatus.textContent = approved
       ? '✓ Narração aprovada. O vídeo usará exatamente esta faixa de áudio.'
       : 'Ouça a faixa e marque a caixa para liberar o vídeo.';
@@ -1323,8 +1323,17 @@ function renderCampaign(d, c, fromHistory) {
   previewButton.addEventListener('click', prepareAndPreviewVoice);
 
   $('videoBtn').addEventListener('click', function () {
-    if (!preparedAudioBase64 || !approveVoiceCheckbox.checked) {
-      previewStatus.textContent = 'Gere e escute a narração, depois confirme a aprovação antes de criar o vídeo.';
+    if (!preparedAudioBase64) {
+      previewStatus.textContent = 'Preparando a narração primeiro. Quando ela carregar, ouça e marque a aprovação para gerar o vídeo.';
+      prepareAndPreviewVoice();
+      return;
+    }
+    if (!approveVoiceCheckbox.checked) {
+      previewStatus.textContent = 'Ouça a narração no player e marque a caixa de aprovação. O botão permanece disponível.';
+      previewPlayer.scrollIntoView({behavior:'smooth', block:'center'});
+      previewPlayer.play().catch(function () {
+        previewStatus.textContent = 'Use o botão de reprodução do player para ouvir a narração e depois marque a aprovação.';
+      });
       return;
     }
     const files = localImageInput ? Array.from(localImageInput.files || []).filter(function (file) {
