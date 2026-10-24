@@ -328,6 +328,68 @@ button:disabled { cursor: not-allowed; filter: saturate(.55); }
   }
 }
 
+
+/* AXO premium landing refresh — graphite + champagne gold */
+:root{--bg:#080807;--panel:#141311;--line:#302d26;--text:#f8f5ed;--muted:#b3afa5;--axo-gold:#e7c783;--axo-gold-deep:#9e7938}
+body{background:radial-gradient(ellipse at 85% 8%,#6d51201c,transparent 34%),radial-gradient(ellipse at 0% 35%,#ffffff06,transparent 30%),#080807}
+.wrap{max-width:1320px}
+.nav{height:78px;gap:24px;border-bottom-color:#d7b45a20}
+.navlinks{gap:clamp(10px,1.7vw,25px);font-size:13px;color:#d3cfc5}
+.navlinks a:not(.btn){transition:color .2s}
+.navlinks a:not(.btn):hover{color:var(--axo-gold)}
+.brand-image{width:145px;height:60px}
+.btn:not(.secondary){background:linear-gradient(120deg,#f6dda0,#d7ad60 70%,#b58a42);color:#17120a;box-shadow:0 8px 26px #d7b45a20}
+.btn.secondary{border-color:#80673a;color:#f7f0e1;background:#0c0b09}
+.btn:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var(--axo-gold);outline-offset:4px}
+.hero{max-width:1320px;padding-top:60px;padding-bottom:55px;grid-template-columns:1fr 1.04fr;gap:48px}
+h1{font-size:clamp(42px,5vw,70px);letter-spacing:-2.4px;max-width:650px}
+.gradient{background:linear-gradient(100deg,#fff4d4 0%,#e6c47e 48%,#b68a43 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.eyebrow{border-color:#d7b45a55;background:#d7b45a0b;color:#f4e6c1}
+.dot{background:#e7c783;box-shadow:0 0 14px #d7b45a88}
+.preview{border-color:#76613c;background:linear-gradient(145deg,#191713f5,#0d0c0af5);box-shadow:0 28px 80px #000b,0 0 0 1px #d7b45a0c;transform:none}
+.mockvideo{background:radial-gradient(circle at 70% 30%,#d7b45a20,transparent 40%),linear-gradient(135deg,#292216,#100f0c 62%,#18130b)}
+.video-tag,.kicker,.output h4,.stepnum{color:var(--axo-gold)}
+.mini{background:#ffffff04;border-color:#d7b45a25}
+.mini b{color:#f5dfaa}
+.section{padding:66px 0}
+.sectionhead{margin-bottom:34px}
+.section h2{letter-spacing:-1.1px}
+.features{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.feature,.panel{border-color:#302c24;background:linear-gradient(145deg,#171614,#100f0d);border-radius:17px;transition:border-color .2s,transform .2s,box-shadow .2s}
+.feature:hover{border-color:#806b42;transform:translateY(-3px);box-shadow:0 12px 35px #0005}
+.ico{background:#d7b45a12;border-color:#d7b45a40;color:#e7c783;box-shadow:0 0 20px #d7b45a0b}
+.lead,.sub,.hint,.notice{color:#b8b3a8}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#d7b45a;box-shadow:0 0 0 3px #d7b45a1a}
+.studio-kit,.guided-progress{border-color:#554426;background:linear-gradient(135deg,#17140d,#0a0908)}
+.guided-progress .guided-number{color:#f1d28b;border-color:#9e7938}
+.result-step-heading .step-label,.output .copy-card h4,.kit-card h4{color:#e7c783}
+.cta{border-color:#5b4a2b;background:radial-gradient(ellipse at 80% 0%,#d7b45a22,transparent 44%),radial-gradient(ellipse at 0% 100%,#d7b45a14,transparent 40%),#11100d}
+.stats-strip{border-top:1px solid #d7b45a20;border-bottom:1px solid #d7b45a20;background:#0b0a08}
+.stats-inner{max-width:1320px;margin:auto;padding:22px 24px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.stat-item{display:flex;align-items:center;gap:13px;padding:5px 16px;border-right:1px solid #ffffff12}
+.stat-item:last-child{border-right:0}
+.stat-icon{font-size:25px;color:#e7c783}
+.stat-item strong{display:block;color:#e7c783;font-size:23px;line-height:1.2}
+.stat-item span:last-child{display:block;color:#b9b3a7;font-size:12px}
+.results-band{padding:52px 0;background:radial-gradient(ellipse at 90% 50%,#8b69251c,transparent 40%),#0b0a08;border-top:1px solid #ffffff0b;border-bottom:1px solid #ffffff0b}
+.results-inner{max-width:1320px;padding:0 24px;margin:auto;display:grid;grid-template-columns:.75fr 1fr 1.15fr;gap:22px;align-items:center}
+.results-phone{min-height:205px;border-radius:24px;border:1px solid #65512d;background:radial-gradient(circle at 70% 25%,#e7c7832c,transparent 35%),linear-gradient(145deg,#282116,#090908);padding:25px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 15px 45px #0008}
+.results-phone strong{font-size:25px;line-height:1.1;max-width:180px}
+.metric-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.metric-card{padding:17px;border:1px solid #383126;background:#15130f;border-radius:14px}
+.metric-card span{display:block;color:#b9b3a7;font-size:12px}
+.metric-card strong{display:block;color:#f5e5bf;font-size:23px}
+.metric-card small{color:#86c98d}
+.results-copy h2{font-size:clamp(25px,3vw,38px);line-height:1.1;margin:10px 0}
+.results-copy p{color:#b9b3a7}
+.results-copy .btn{margin-top:8px}
+#recursos .sectionhead h2{max-width:700px;margin-inline:auto}
+#gerador .panel{box-shadow:0 18px 45px #0003}
+footer{border-top-color:#d7b45a20}
+@media(max-width:900px){.features{grid-template-columns:repeat(2,minmax(0,1fr))}.results-inner{grid-template-columns:1fr 1fr}.results-copy{grid-column:1/-1}.navlinks{gap:10px}}
+@media(max-width:600px){.hero{padding-top:38px;gap:28px}.features{grid-template-columns:1fr}.stats-inner{grid-template-columns:1fr 1fr;padding:16px}.stat-item{padding:8px;border-right:0}.stat-item strong{font-size:20px}.results-inner{grid-template-columns:1fr;padding:0 17px}.results-copy{grid-column:auto}.wrap{padding-left:17px;padding-right:17px}.brand-image{width:112px}.nav{height:68px}.navlinks a:not(.navcta){display:none}}
+@media(prefers-reduced-motion:reduce){.feature,.btn,.navlinks a{transition:none!important;transform:none!important}}
+
 </style>
 </head>
 <body>
@@ -386,12 +448,26 @@ button:disabled { cursor: not-allowed; filter: saturate(.55); }
   <div class="minirow"><div class="mini"><b>01</b><small>Estratégia</small></div><div class="mini"><b>02</b><small>Roteiro</small></div><div class="mini"><b>03</b><small>Criação</small></div></div>
  </div>
 </section>
+
+<div class="stats-strip" aria-label="Benefícios da AXO"><div class="stats-inner">
+ <div class="stat-item"><span class="stat-icon" aria-hidden="true">ϟ</span><div><strong>Mais rápido</strong><span>Da ideia ao primeiro conceito</span></div></div>
+ <div class="stat-item"><span class="stat-icon" aria-hidden="true">▥</span><div><strong>Um só lugar</strong><span>Texto, direção criativa e vídeo</span></div></div>
+ <div class="stat-item"><span class="stat-icon" aria-hidden="true">◎</span><div><strong>Seu negócio</strong><span>Conteúdo adaptável à sua marca</span></div></div>
+ <div class="stat-item"><span class="stat-icon" aria-hidden="true">✧</span><div><strong>IA + criação</strong><span>Fluxo guiado para produzir melhor</span></div></div>
+</div></div>
+
 <section class="section" id="recursos"><div class="wrap">
  <div class="sectionhead"><div class="kicker">Uma ideia, vários recursos</div><h2>Seu ponto de partida para anúncios melhores.</h2><p class="sub">Ferramentas pensadas para simplificar o trabalho de quem divulga produtos e serviços.</p></div>
  <div class="features">
   <article class="feature"><div class="ico">✍️</div><h3>Roteiros que prendem</h3><p>Organize gancho, benefício e chamada para ação em uma estrutura pronta para gravar ou editar.</p></article>
   <article class="feature"><div class="ico">🎯</div><h3>Mensagem para seu público</h3><p>Adapte o tom, o canal e o objetivo para comunicar o valor do seu produto com clareza.</p></article>
   <article class="feature"><div class="ico">⚡</div><h3>Do briefing à campanha</h3><p>Reúna a ideia, a copy e as cenas sugeridas em um único lugar para agilizar a produção.</p></article>
+
+  <article class="feature"><div class="ico">✦</div><h3>Gerador de campanhas</h3><p>Transforme o briefing em uma primeira proposta de anúncio.</p></article>
+  <article class="feature"><div class="ico">▤</div><h3>Textos e legendas</h3><p>Crie mensagens, chamadas e hashtags para revisar.</p></article>
+  <article class="feature"><div class="ico">▧</div><h3>Direção visual</h3><p>Organize referências e ideias para as peças criativas.</p></article>
+  <article class="feature"><div class="ico">▶</div><h3>Vídeo com narração</h3><p>Monte vídeos verticais e aprove a voz antes de renderizar.</p></article>
+  <article class="feature"><div class="ico">◈</div><h3>Kit de produção</h3><p>Reúna prompts visuais, trilha e efeitos em um kit prático.</p></article>
  </div>
 </div></section>
 <section class="section" id="gerador"><div class="wrap">
@@ -450,6 +526,13 @@ button:disabled { cursor: not-allowed; filter: saturate(.55); }
   <p class="tiny">Depois de ouvir e baixar os três arquivos, envie-os nesta conversa para eu substituir o áudio dos vídeos. Nenhum Reel será agendado por esta ferramenta.</p>
  </div>
 </div></section>
+
+<section class="results-band" aria-label="Visão de resultados demonstrativa"><div class="results-inner">
+ <div class="results-phone"><span class="kicker">CONCEITO CRIATIVO</span><strong>SUA MARCA.<br>MAIS PRESENTE.</strong><span class="tiny">Prévia ilustrativa de campanha</span></div>
+ <div class="metric-cards"><div class="metric-card"><span>Etapa</span><strong>Briefing</strong><small>Organize a ideia</small></div><div class="metric-card"><span>Etapa</span><strong>Criação</strong><small>Revise o conteúdo</small></div></div>
+ <div class="results-copy"><span class="kicker">DA IDEIA À EXECUÇÃO</span><h2>Campanhas com uma direção criativa mais clara.</h2><p>Organize texto, conceito visual e narração em um fluxo simples. Os resultados dependem da sua estratégia e do conteúdo publicado.</p><a class="btn" href="#gerador">Comece a criar →</a></div>
+</div></section>
+
 <section class="section" id="como-funciona"><div class="wrap">
  <div class="sectionhead"><div class="kicker">Simples por design</div><h2>Da ideia à execução em três passos.</h2></div>
  <div class="steps"><article class="feature step"><div class="stepnum">PASSO 01</div><h3>Conte sua ideia</h3><p>Explique o produto, o público e o resultado que você busca.</p></article><article class="feature step"><div class="stepnum">PASSO 02</div><h3>Gere o conceito</h3><p>Receba uma estrutura inicial de roteiro, texto e cenas para revisar.</p></article><article class="feature step"><div class="stepnum">PASSO 03</div><h3>Revise e produza</h3><p>Ajuste as sugestões antes de gravar, editar ou publicar seu anúncio.</p></article></div>
