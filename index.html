@@ -221,6 +221,113 @@ html[data-theme="purple"] .reel-voice-icon{background:#a855f71c;border-color:#c0
 @media(min-width:700px){.reel-voice-item{grid-template-columns:minmax(180px,1fr) minmax(220px,1.2fr) auto;align-items:center}.reel-voice-item audio{grid-column:auto}.reel-voice-download{justify-self:end}}
 @media(max-width:520px){.reel-voice-panel{padding:14px}.reel-voice-item{padding:12px}.reel-voice-download{width:100%}}
 
+
+/* AXO visual refresh v1 — premium graphite + champagne gold */
+:root{
+  --bg:#080807;--panel:#11110f;--line:#302b20;--text:#f7f4ec;--muted:#b1aca0;
+  --axo-gold:#d7b45a;--axo-gold-light:#f0d891;--axo-gold-dim:#8e7135;
+}
+body{
+  background:
+    radial-gradient(ellipse at 78% 0%,#3b2c101c 0,transparent 34%),
+    radial-gradient(ellipse at 10% 30%,#ffffff05 0,transparent 35%),var(--bg);
+}
+.nav{border-bottom-color:#d7b45a26}
+.logo{background:linear-gradient(135deg,#f0d891,#98742e);color:#17130a;box-shadow:0 0 26px #d7b45a20}
+.btn:not(.secondary){
+  background:linear-gradient(120deg,#f0d891 0%,#d7b45a 48%,#a98231 100%);
+  color:#17130a;box-shadow:0 10px 30px #d7b45a22;
+}
+.btn:not(.secondary):hover{filter:brightness(1.07);box-shadow:0 12px 34px #d7b45a30}
+.btn.secondary{border-color:#51452c;background:linear-gradient(145deg,#171612,#10100e)}
+.eyebrow{border-color:#d7b45a55;color:#f0d891;background:#d7b45a0c}
+.dot{background:#f0d891;box-shadow:0 0 14px #d7b45a75}
+.gradient{background:linear-gradient(100deg,#fff8e5,#f0d891 45%,#b58a38);-webkit-background-clip:text;background-clip:text;color:transparent}
+.proof span:before,.kicker,.output h4,.stepnum{color:#e0c16d}
+.preview{border-color:#d7b45a38;background:linear-gradient(145deg,#1b1913f2,#0d0d0bf5);box-shadow:0 30px 90px #000a,0 0 0 1px #d7b45a08}
+.mockvideo{background:radial-gradient(circle at 72% 28%,#d7b45a1c,transparent 38%),linear-gradient(135deg,#29251a,#0e0e0c 62%,#19150d)}
+.mockvideo:before{border-color:#d7b45a40;box-shadow:0 0 0 24px #d7b45a09,0 0 0 50px #d7b45a05}
+.video-tag{color:#f0d891}
+.play{background:#d7b45a20;border-color:#d7b45a75}
+.mini{border-color:#d7b45a20;background:#ffffff04}
+.mini b{color:#f6e6ba}
+.feature,.panel{border-color:#d7b45a20;background:linear-gradient(145deg,#171612,#0f0f0d);box-shadow:0 12px 36px #0003}
+.feature:hover{border-color:#d7b45a55;transform:translateY(-2px);transition:transform .2s,border-color .2s}
+.ico{background:#d7b45a12;border-color:#d7b45a30;color:#f0d891}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#d7b45a;box-shadow:0 0 0 3px #d7b45a18}
+.pill{border-color:#d7b45a2e;background:#d7b45a0c;color:#e8d7aa}
+.cta{border-color:#d7b45a40;background:radial-gradient(ellipse at 80% 0%,#d7b45a15,transparent 42%),#11110f}
+.history-item{border-color:#d7b45a20}
+.studio-kit{border-color:#80652d;background:linear-gradient(145deg,#19160f,#0a0a09);box-shadow:0 14px 40px #0004}
+.studio-kit h3{color:#f5e5b9}
+.kit-field select:focus{outline:2px solid #d7b45a;outline-offset:1px}
+.kit-card{border-color:#4a3c22;background:linear-gradient(145deg,#14120d,#0a0a09)}
+.guided-progress{border-color:#665126;background:linear-gradient(135deg,#19160f,#0b0b09)}
+.guided-progress button{border-color:#44371e;background:#0d0d0b}
+.guided-progress button:hover,.guided-progress button:focus-visible{border-color:#f0d891;background:#211b0e}
+.guided-progress .guided-number{border-color:#b18b3b;color:#f0d891}
+.guided-focus{outline-color:#d7b45a}
+::selection{background:#d7b45a55;color:#fff}
+@media(max-width:800px){
+  .hero{padding-top:38px}
+  .preview{transform:none}
+  .actions .btn{flex:1 1 180px}
+  .feature,.panel{border-radius:18px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
+}
+
+
+
+/* AXO premium dashboard refinement — visual-only overrides */
+:root {
+  color-scheme: dark;
+  --axo-bg: #080b0d;
+  --axo-panel: #101416;
+  --axo-panel-raised: #15191b;
+  --axo-border: rgba(226, 193, 119, .22);
+  --axo-gold: #e7c779;
+  --axo-gold-bright: #ffe7a3;
+  --axo-text: #f6f3ec;
+  --axo-muted: #a8adb1;
+}
+html { background: var(--axo-bg); }
+body {
+  background:
+    radial-gradient(ellipse at 78% 0%, rgba(185, 143, 54, .075), transparent 36rem),
+    var(--axo-bg);
+  color: var(--axo-text);
+}
+button, input, select, textarea { font: inherit; }
+button, [role="button"], .button, a.button {
+  transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease, transform .18s ease, color .18s ease;
+}
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--axo-gold-bright);
+  outline-offset: 3px;
+}
+button:not(:disabled):hover, [role="button"]:not([aria-disabled="true"]):hover, a.button:hover {
+  border-color: rgba(231,199,121,.62);
+  box-shadow: 0 7px 24px rgba(0,0,0,.24), 0 0 18px rgba(231,199,121,.08);
+}
+button:disabled { cursor: not-allowed; filter: saturate(.55); }
+:where(.card, .panel, .section-card, .result-card, .history-card, .workflow-card, .creative-card) {
+  border-color: var(--axo-border);
+  box-shadow: 0 12px 32px rgba(0,0,0,.14);
+}
+:where(h1, h2, h3) { letter-spacing: -.025em; text-wrap: balance; }
+:where(p, .muted, .description, small) { color: var(--axo-muted); }
+::selection { color: #14110a; background: var(--axo-gold); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
 </style>
 </head>
 <body>
