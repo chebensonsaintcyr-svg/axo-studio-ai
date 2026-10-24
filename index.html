@@ -278,6 +278,56 @@ body{
   *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
 }
 
+
+
+/* AXO premium dashboard refinement — visual-only overrides */
+:root {
+  color-scheme: dark;
+  --axo-bg: #080b0d;
+  --axo-panel: #101416;
+  --axo-panel-raised: #15191b;
+  --axo-border: rgba(226, 193, 119, .22);
+  --axo-gold: #e7c779;
+  --axo-gold-bright: #ffe7a3;
+  --axo-text: #f6f3ec;
+  --axo-muted: #a8adb1;
+}
+html { background: var(--axo-bg); }
+body {
+  background:
+    radial-gradient(ellipse at 78% 0%, rgba(185, 143, 54, .075), transparent 36rem),
+    var(--axo-bg);
+  color: var(--axo-text);
+}
+button, input, select, textarea { font: inherit; }
+button, [role="button"], .button, a.button {
+  transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease, transform .18s ease, color .18s ease;
+}
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--axo-gold-bright);
+  outline-offset: 3px;
+}
+button:not(:disabled):hover, [role="button"]:not([aria-disabled="true"]):hover, a.button:hover {
+  border-color: rgba(231,199,121,.62);
+  box-shadow: 0 7px 24px rgba(0,0,0,.24), 0 0 18px rgba(231,199,121,.08);
+}
+button:disabled { cursor: not-allowed; filter: saturate(.55); }
+:where(.card, .panel, .section-card, .result-card, .history-card, .workflow-card, .creative-card) {
+  border-color: var(--axo-border);
+  box-shadow: 0 12px 32px rgba(0,0,0,.14);
+}
+:where(h1, h2, h3) { letter-spacing: -.025em; text-wrap: balance; }
+:where(p, .muted, .description, small) { color: var(--axo-muted); }
+::selection { color: #14110a; background: var(--axo-gold); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
 </style>
 </head>
 <body>
