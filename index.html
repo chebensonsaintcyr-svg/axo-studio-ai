@@ -221,6 +221,175 @@ html[data-theme="purple"] .reel-voice-icon{background:#a855f71c;border-color:#c0
 @media(min-width:700px){.reel-voice-item{grid-template-columns:minmax(180px,1fr) minmax(220px,1.2fr) auto;align-items:center}.reel-voice-item audio{grid-column:auto}.reel-voice-download{justify-self:end}}
 @media(max-width:520px){.reel-voice-panel{padding:14px}.reel-voice-item{padding:12px}.reel-voice-download{width:100%}}
 
+
+/* AXO visual refresh v1 — premium graphite + champagne gold */
+:root{
+  --bg:#080807;--panel:#11110f;--line:#302b20;--text:#f7f4ec;--muted:#b1aca0;
+  --axo-gold:#d7b45a;--axo-gold-light:#f0d891;--axo-gold-dim:#8e7135;
+}
+body{
+  background:
+    radial-gradient(ellipse at 78% 0%,#3b2c101c 0,transparent 34%),
+    radial-gradient(ellipse at 10% 30%,#ffffff05 0,transparent 35%),var(--bg);
+}
+.nav{border-bottom-color:#d7b45a26}
+.logo{background:linear-gradient(135deg,#f0d891,#98742e);color:#17130a;box-shadow:0 0 26px #d7b45a20}
+.btn:not(.secondary){
+  background:linear-gradient(120deg,#f0d891 0%,#d7b45a 48%,#a98231 100%);
+  color:#17130a;box-shadow:0 10px 30px #d7b45a22;
+}
+.btn:not(.secondary):hover{filter:brightness(1.07);box-shadow:0 12px 34px #d7b45a30}
+.btn.secondary{border-color:#51452c;background:linear-gradient(145deg,#171612,#10100e)}
+.eyebrow{border-color:#d7b45a55;color:#f0d891;background:#d7b45a0c}
+.dot{background:#f0d891;box-shadow:0 0 14px #d7b45a75}
+.gradient{background:linear-gradient(100deg,#fff8e5,#f0d891 45%,#b58a38);-webkit-background-clip:text;background-clip:text;color:transparent}
+.proof span:before,.kicker,.output h4,.stepnum{color:#e0c16d}
+.preview{border-color:#d7b45a38;background:linear-gradient(145deg,#1b1913f2,#0d0d0bf5);box-shadow:0 30px 90px #000a,0 0 0 1px #d7b45a08}
+.mockvideo{background:radial-gradient(circle at 72% 28%,#d7b45a1c,transparent 38%),linear-gradient(135deg,#29251a,#0e0e0c 62%,#19150d)}
+.mockvideo:before{border-color:#d7b45a40;box-shadow:0 0 0 24px #d7b45a09,0 0 0 50px #d7b45a05}
+.video-tag{color:#f0d891}
+.play{background:#d7b45a20;border-color:#d7b45a75}
+.mini{border-color:#d7b45a20;background:#ffffff04}
+.mini b{color:#f6e6ba}
+.feature,.panel{border-color:#d7b45a20;background:linear-gradient(145deg,#171612,#0f0f0d);box-shadow:0 12px 36px #0003}
+.feature:hover{border-color:#d7b45a55;transform:translateY(-2px);transition:transform .2s,border-color .2s}
+.ico{background:#d7b45a12;border-color:#d7b45a30;color:#f0d891}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#d7b45a;box-shadow:0 0 0 3px #d7b45a18}
+.pill{border-color:#d7b45a2e;background:#d7b45a0c;color:#e8d7aa}
+.cta{border-color:#d7b45a40;background:radial-gradient(ellipse at 80% 0%,#d7b45a15,transparent 42%),#11110f}
+.history-item{border-color:#d7b45a20}
+.studio-kit{border-color:#80652d;background:linear-gradient(145deg,#19160f,#0a0a09);box-shadow:0 14px 40px #0004}
+.studio-kit h3{color:#f5e5b9}
+.kit-field select:focus{outline:2px solid #d7b45a;outline-offset:1px}
+.kit-card{border-color:#4a3c22;background:linear-gradient(145deg,#14120d,#0a0a09)}
+.guided-progress{border-color:#665126;background:linear-gradient(135deg,#19160f,#0b0b09)}
+.guided-progress button{border-color:#44371e;background:#0d0d0b}
+.guided-progress button:hover,.guided-progress button:focus-visible{border-color:#f0d891;background:#211b0e}
+.guided-progress .guided-number{border-color:#b18b3b;color:#f0d891}
+.guided-focus{outline-color:#d7b45a}
+::selection{background:#d7b45a55;color:#fff}
+@media(max-width:800px){
+  .hero{padding-top:38px}
+  .preview{transform:none}
+  .actions .btn{flex:1 1 180px}
+  .feature,.panel{border-radius:18px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
+}
+
+
+
+/* AXO premium dashboard refinement — visual-only overrides */
+:root {
+  color-scheme: dark;
+  --axo-bg: #080b0d;
+  --axo-panel: #101416;
+  --axo-panel-raised: #15191b;
+  --axo-border: rgba(226, 193, 119, .22);
+  --axo-gold: #e7c779;
+  --axo-gold-bright: #ffe7a3;
+  --axo-text: #f6f3ec;
+  --axo-muted: #a8adb1;
+}
+html { background: var(--axo-bg); }
+body {
+  background:
+    radial-gradient(ellipse at 78% 0%, rgba(185, 143, 54, .075), transparent 36rem),
+    var(--axo-bg);
+  color: var(--axo-text);
+}
+button, input, select, textarea { font: inherit; }
+button, [role="button"], .button, a.button {
+  transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease, transform .18s ease, color .18s ease;
+}
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--axo-gold-bright);
+  outline-offset: 3px;
+}
+button:not(:disabled):hover, [role="button"]:not([aria-disabled="true"]):hover, a.button:hover {
+  border-color: rgba(231,199,121,.62);
+  box-shadow: 0 7px 24px rgba(0,0,0,.24), 0 0 18px rgba(231,199,121,.08);
+}
+button:disabled { cursor: not-allowed; filter: saturate(.55); }
+:where(.card, .panel, .section-card, .result-card, .history-card, .workflow-card, .creative-card) {
+  border-color: var(--axo-border);
+  box-shadow: 0 12px 32px rgba(0,0,0,.14);
+}
+:where(h1, h2, h3) { letter-spacing: -.025em; text-wrap: balance; }
+:where(p, .muted, .description, small) { color: var(--axo-muted); }
+::selection { color: #14110a; background: var(--axo-gold); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+
+/* AXO premium landing refresh — graphite + champagne gold */
+:root{--bg:#080807;--panel:#141311;--line:#302d26;--text:#f8f5ed;--muted:#b3afa5;--axo-gold:#e7c783;--axo-gold-deep:#9e7938}
+body{background:radial-gradient(ellipse at 85% 8%,#6d51201c,transparent 34%),radial-gradient(ellipse at 0% 35%,#ffffff06,transparent 30%),#080807}
+.wrap{max-width:1320px}
+.nav{height:78px;gap:24px;border-bottom-color:#d7b45a20}
+.navlinks{gap:clamp(10px,1.7vw,25px);font-size:13px;color:#d3cfc5}
+.navlinks a:not(.btn){transition:color .2s}
+.navlinks a:not(.btn):hover{color:var(--axo-gold)}
+.brand-image{width:145px;height:60px}
+.btn:not(.secondary){background:linear-gradient(120deg,#f6dda0,#d7ad60 70%,#b58a42);color:#17120a;box-shadow:0 8px 26px #d7b45a20}
+.btn.secondary{border-color:#80673a;color:#f7f0e1;background:#0c0b09}
+.btn:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var(--axo-gold);outline-offset:4px}
+.hero{max-width:1320px;padding-top:60px;padding-bottom:55px;grid-template-columns:1fr 1.04fr;gap:48px}
+h1{font-size:clamp(42px,5vw,70px);letter-spacing:-2.4px;max-width:650px}
+.gradient{background:linear-gradient(100deg,#fff4d4 0%,#e6c47e 48%,#b68a43 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.eyebrow{border-color:#d7b45a55;background:#d7b45a0b;color:#f4e6c1}
+.dot{background:#e7c783;box-shadow:0 0 14px #d7b45a88}
+.preview{border-color:#76613c;background:linear-gradient(145deg,#191713f5,#0d0c0af5);box-shadow:0 28px 80px #000b,0 0 0 1px #d7b45a0c;transform:none}
+.mockvideo{background:radial-gradient(circle at 70% 30%,#d7b45a20,transparent 40%),linear-gradient(135deg,#292216,#100f0c 62%,#18130b)}
+.video-tag,.kicker,.output h4,.stepnum{color:var(--axo-gold)}
+.mini{background:#ffffff04;border-color:#d7b45a25}
+.mini b{color:#f5dfaa}
+.section{padding:66px 0}
+.sectionhead{margin-bottom:34px}
+.section h2{letter-spacing:-1.1px}
+.features{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.feature,.panel{border-color:#302c24;background:linear-gradient(145deg,#171614,#100f0d);border-radius:17px;transition:border-color .2s,transform .2s,box-shadow .2s}
+.feature:hover{border-color:#806b42;transform:translateY(-3px);box-shadow:0 12px 35px #0005}
+.ico{background:#d7b45a12;border-color:#d7b45a40;color:#e7c783;box-shadow:0 0 20px #d7b45a0b}
+.lead,.sub,.hint,.notice{color:#b8b3a8}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#d7b45a;box-shadow:0 0 0 3px #d7b45a1a}
+.studio-kit,.guided-progress{border-color:#554426;background:linear-gradient(135deg,#17140d,#0a0908)}
+.guided-progress .guided-number{color:#f1d28b;border-color:#9e7938}
+.result-step-heading .step-label,.output .copy-card h4,.kit-card h4{color:#e7c783}
+.cta{border-color:#5b4a2b;background:radial-gradient(ellipse at 80% 0%,#d7b45a22,transparent 44%),radial-gradient(ellipse at 0% 100%,#d7b45a14,transparent 40%),#11100d}
+.stats-strip{border-top:1px solid #d7b45a20;border-bottom:1px solid #d7b45a20;background:#0b0a08}
+.stats-inner{max-width:1320px;margin:auto;padding:22px 24px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.stat-item{display:flex;align-items:center;gap:13px;padding:5px 16px;border-right:1px solid #ffffff12}
+.stat-item:last-child{border-right:0}
+.stat-icon{font-size:25px;color:#e7c783}
+.stat-item strong{display:block;color:#e7c783;font-size:23px;line-height:1.2}
+.stat-item span:last-child{display:block;color:#b9b3a7;font-size:12px}
+.results-band{padding:52px 0;background:radial-gradient(ellipse at 90% 50%,#8b69251c,transparent 40%),#0b0a08;border-top:1px solid #ffffff0b;border-bottom:1px solid #ffffff0b}
+.results-inner{max-width:1320px;padding:0 24px;margin:auto;display:grid;grid-template-columns:.75fr 1fr 1.15fr;gap:22px;align-items:center}
+.results-phone{min-height:205px;border-radius:24px;border:1px solid #65512d;background:radial-gradient(circle at 70% 25%,#e7c7832c,transparent 35%),linear-gradient(145deg,#282116,#090908);padding:25px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 15px 45px #0008}
+.results-phone strong{font-size:25px;line-height:1.1;max-width:180px}
+.metric-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.metric-card{padding:17px;border:1px solid #383126;background:#15130f;border-radius:14px}
+.metric-card span{display:block;color:#b9b3a7;font-size:12px}
+.metric-card strong{display:block;color:#f5e5bf;font-size:23px}
+.metric-card small{color:#86c98d}
+.results-copy h2{font-size:clamp(25px,3vw,38px);line-height:1.1;margin:10px 0}
+.results-copy p{color:#b9b3a7}
+.results-copy .btn{margin-top:8px}
+#recursos .sectionhead h2{max-width:700px;margin-inline:auto}
+#gerador .panel{box-shadow:0 18px 45px #0003}
+footer{border-top-color:#d7b45a20}
+@media(max-width:900px){.features{grid-template-columns:repeat(2,minmax(0,1fr))}.results-inner{grid-template-columns:1fr 1fr}.results-copy{grid-column:1/-1}.navlinks{gap:10px}}
+@media(max-width:600px){.hero{padding-top:38px;gap:28px}.features{grid-template-columns:1fr}.stats-inner{grid-template-columns:1fr 1fr;padding:16px}.stat-item{padding:8px;border-right:0}.stat-item strong{font-size:20px}.results-inner{grid-template-columns:1fr;padding:0 17px}.results-copy{grid-column:auto}.wrap{padding-left:17px;padding-right:17px}.brand-image{width:112px}.nav{height:68px}.navlinks a:not(.navcta){display:none}}
+@media(prefers-reduced-motion:reduce){.feature,.btn,.navlinks a{transition:none!important;transform:none!important}}
+
 </style>
 </head>
 <body>
@@ -279,12 +448,26 @@ html[data-theme="purple"] .reel-voice-icon{background:#a855f71c;border-color:#c0
   <div class="minirow"><div class="mini"><b>01</b><small>Estratégia</small></div><div class="mini"><b>02</b><small>Roteiro</small></div><div class="mini"><b>03</b><small>Criação</small></div></div>
  </div>
 </section>
+
+<div class="stats-strip" aria-label="Benefícios da AXO"><div class="stats-inner">
+ <div class="stat-item"><span class="stat-icon" aria-hidden="true">ϟ</span><div><strong>Mais rápido</strong><span>Da ideia ao primeiro conceito</span></div></div>
+ <div class="stat-item"><span class="stat-icon" aria-hidden="true">▥</span><div><strong>Um só lugar</strong><span>Texto, direção criativa e vídeo</span></div></div>
+ <div class="stat-item"><span class="stat-icon" aria-hidden="true">◎</span><div><strong>Seu negócio</strong><span>Conteúdo adaptável à sua marca</span></div></div>
+ <div class="stat-item"><span class="stat-icon" aria-hidden="true">✧</span><div><strong>IA + criação</strong><span>Fluxo guiado para produzir melhor</span></div></div>
+</div></div>
+
 <section class="section" id="recursos"><div class="wrap">
  <div class="sectionhead"><div class="kicker">Uma ideia, vários recursos</div><h2>Seu ponto de partida para anúncios melhores.</h2><p class="sub">Ferramentas pensadas para simplificar o trabalho de quem divulga produtos e serviços.</p></div>
  <div class="features">
   <article class="feature"><div class="ico">✍️</div><h3>Roteiros que prendem</h3><p>Organize gancho, benefício e chamada para ação em uma estrutura pronta para gravar ou editar.</p></article>
   <article class="feature"><div class="ico">🎯</div><h3>Mensagem para seu público</h3><p>Adapte o tom, o canal e o objetivo para comunicar o valor do seu produto com clareza.</p></article>
   <article class="feature"><div class="ico">⚡</div><h3>Do briefing à campanha</h3><p>Reúna a ideia, a copy e as cenas sugeridas em um único lugar para agilizar a produção.</p></article>
+
+  <article class="feature"><div class="ico">✦</div><h3>Gerador de campanhas</h3><p>Transforme o briefing em uma primeira proposta de anúncio.</p></article>
+  <article class="feature"><div class="ico">▤</div><h3>Textos e legendas</h3><p>Crie mensagens, chamadas e hashtags para revisar.</p></article>
+  <article class="feature"><div class="ico">▧</div><h3>Direção visual</h3><p>Organize referências e ideias para as peças criativas.</p></article>
+  <article class="feature"><div class="ico">▶</div><h3>Vídeo com narração</h3><p>Monte vídeos verticais e aprove a voz antes de renderizar.</p></article>
+  <article class="feature"><div class="ico">◈</div><h3>Kit de produção</h3><p>Reúna prompts visuais, trilha e efeitos em um kit prático.</p></article>
  </div>
 </div></section>
 <section class="section" id="gerador"><div class="wrap">
@@ -343,6 +526,13 @@ html[data-theme="purple"] .reel-voice-icon{background:#a855f71c;border-color:#c0
   <p class="tiny">Depois de ouvir e baixar os três arquivos, envie-os nesta conversa para eu substituir o áudio dos vídeos. Nenhum Reel será agendado por esta ferramenta.</p>
  </div>
 </div></section>
+
+<section class="results-band" aria-label="Visão de resultados demonstrativa"><div class="results-inner">
+ <div class="results-phone"><span class="kicker">CONCEITO CRIATIVO</span><strong>SUA MARCA.<br>MAIS PRESENTE.</strong><span class="tiny">Prévia ilustrativa de campanha</span></div>
+ <div class="metric-cards"><div class="metric-card"><span>Etapa</span><strong>Briefing</strong><small>Organize a ideia</small></div><div class="metric-card"><span>Etapa</span><strong>Criação</strong><small>Revise o conteúdo</small></div></div>
+ <div class="results-copy"><span class="kicker">DA IDEIA À EXECUÇÃO</span><h2>Campanhas com uma direção criativa mais clara.</h2><p>Organize texto, conceito visual e narração em um fluxo simples. Os resultados dependem da sua estratégia e do conteúdo publicado.</p><a class="btn" href="#gerador">Comece a criar →</a></div>
+</div></section>
+
 <section class="section" id="como-funciona"><div class="wrap">
  <div class="sectionhead"><div class="kicker">Simples por design</div><h2>Da ideia à execução em três passos.</h2></div>
  <div class="steps"><article class="feature step"><div class="stepnum">PASSO 01</div><h3>Conte sua ideia</h3><p>Explique o produto, o público e o resultado que você busca.</p></article><article class="feature step"><div class="stepnum">PASSO 02</div><h3>Gere o conceito</h3><p>Receba uma estrutura inicial de roteiro, texto e cenas para revisar.</p></article><article class="feature step"><div class="stepnum">PASSO 03</div><h3>Revise e produza</h3><p>Ajuste as sugestões antes de gravar, editar ou publicar seu anúncio.</p></article></div>
