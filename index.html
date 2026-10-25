@@ -969,6 +969,23 @@ async function syncCloudCampaignHistory() {
   if (!authClient || !currentAuthSession || !currentAuthSession.user) return;
   const userId = currentAuthSession.user.id;
   try {
+    // Preserve campaigns previously saved only in this browser by uploading them
+    // before refreshing the cloud-backed list. UUID IDs are already cloud records.
+    const localEntries = getCampaignHistory();
+    const pendingEntries = localEntries.filter(function (item) {
+      return !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(item.id));
+    });
+    for (const entry of pendingEntries) {
+      if (!currentAuthSession || !currentAuthSession.user || currentAuthSession.user.id !== userId) return;
+      const inserted = await authClient.from('axo_campaigns').insert({
+        user_id: userId,
+        business_name: String(entry.brief.business || 'Campanha sem nome'),
+        brief: entry.brief,
+        campaign: entry.campaign
+      }).select('id,created_at').single();
+      if (inserted.error) throw inserted.error;
+    }
+
     const result = await authClient.from('axo_campaigns')
       .select('id,user_id,business_name,brief,campaign,created_at')
       .eq('user_id', userId)
@@ -986,7 +1003,7 @@ async function syncCloudCampaignHistory() {
   } catch (err) {
     console.warn('Não foi possível sincronizar o histórico com a nuvem.', err);
     if (typeof showAccountToast === 'function') {
-      showAccountToast('Não foi possível sincronizar o histórico. Confira se a tabela axo_campaigns foi criada.');
+      showAccountToast('Não foi possível sincronizar o histórico. Confira a tabela axo_campaigns e as políticas RLS no Supabase.');
     }
   }
 }
