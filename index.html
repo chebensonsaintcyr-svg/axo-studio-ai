@@ -174,6 +174,15 @@ html[data-theme="gold"] .ico{background:#d7b45a12;border-color:#d7b45a33}
 .auth-tabs{display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:5px;background:#151515;padding:5px;border:1px solid #29251d;border-radius:12px;margin:18px 0}
 .auth-tab{border:1px solid transparent;border-radius:8px;background:transparent;color:#bcb8ae;padding:10px 5px;font:inherit;font-size:11px;font-weight:750;cursor:pointer}
 .auth-tab.is-active{background:#262012;border-color:#755d2a;color:#f1d68b}
+.auth-social{display:grid;gap:9px;margin:16px 0 18px}
+.auth-divider{display:flex;align-items:center;gap:10px;color:#8f8a80;font-size:11px;margin:0 0 2px}
+.auth-divider:before,.auth-divider:after{content:"";height:1px;flex:1;background:#302d27}
+.auth-provider{display:flex;align-items:center;justify-content:center;gap:10px;min-height:45px;width:100%;padding:10px 14px;border:1px solid #39352d;border-radius:11px;background:#141414;color:#f6f3eb;font:inherit;font-size:13px;font-weight:750;cursor:pointer;transition:background .15s,border-color .15s}
+.auth-provider:hover{background:#1d1b17;border-color:#8a7445}
+.auth-provider:focus-visible{outline:2px solid #d7b45a;outline-offset:2px}
+.auth-provider:disabled{opacity:.55;cursor:wait}
+.provider-mark{display:grid;place-items:center;width:22px;height:22px;border-radius:6px;font-weight:900;font-size:15px;background:#f8f8f8;color:#4285f4}
+.facebook-mark{background:#1877f2;color:#fff;font-family:Arial,sans-serif;font-size:19px}
 .auth-field{margin:14px 0}.auth-field label{display:block;font-size:12px;color:#e3dece;margin-bottom:7px}
 .auth-field input{width:100%;min-height:46px;border:1px solid #39352d;border-radius:11px;padding:12px;background:#111;color:#fff;font:inherit;font-size:14px}
 .auth-field input:focus{outline:2px solid #d7b45a;outline-offset:1px;border-color:#d7b45a}
@@ -454,6 +463,11 @@ footer{border-top-color:#d7b45a20}
   <div class="auth-notice" id="authSetupNotice" hidden><strong>Falta conectar o serviço de login.</strong><p>O visual e os formulários já estão preparados, mas a autenticação só será ativada depois de conectar um projeto Supabase e configurar as variáveis do Worker.</p><a href="https://supabase.com/dashboard" target="_blank" rel="noopener noreferrer">Abrir Supabase ↗</a><p class="auth-small">Siga o guia de configuração no repositório. Não envie senhas nem chaves privadas pelo chat.</p></div>
   <div id="authControls">
    <div class="auth-tabs" role="tablist" aria-label="Opções de acesso"><button type="button" class="auth-tab is-active" data-auth-mode="signin" role="tab" aria-selected="true">Entrar</button><button type="button" class="auth-tab" data-auth-mode="signup" role="tab" aria-selected="false">Criar conta</button><button type="button" class="auth-tab" data-auth-mode="recover" role="tab" aria-selected="false">Recuperar senha</button></div>
+   <div class="auth-social" id="authSocialProviders" aria-label="Entrar com uma conta externa">
+    <div class="auth-divider"><span>ou continue com</span></div>
+    <button type="button" class="auth-provider" id="authGoogleBtn"><span class="provider-mark google-mark" aria-hidden="true">G</span><span>Continuar com Google</span></button>
+    <button type="button" class="auth-provider" id="authFacebookBtn"><span class="provider-mark facebook-mark" aria-hidden="true">f</span><span>Continuar com Facebook</span></button>
+   </div>
    <form id="authForm"><div class="auth-field" id="authEmailGroup"><label for="authEmail">E-mail</label><input id="authEmail" type="email" autocomplete="email" maxlength="254" placeholder="voce@exemplo.com" required></div><div class="auth-field" id="authPasswordGroup"><label for="authPassword" id="authPasswordLabel">Senha</label><input id="authPassword" type="password" autocomplete="current-password" minlength="8" maxlength="128" placeholder="Mínimo de 8 caracteres" required></div><button type="submit" class="btn full" id="authSubmitBtn">Entrar</button></form>
   </div>
   <div class="auth-user" id="authUserPanel" hidden>
@@ -766,6 +780,28 @@ function openAuthDialog(mode) {
   }
   if (!authClient) setAuthFeedback('Siga o guia de configuração para ativar o login.', true);
 }
+async function startSocialSignIn(provider) {
+  if (!authClient) {
+    setAuthFeedback('O login ainda não está conectado ao Supabase. Confira a configuração do projeto.', true);
+    return;
+  }
+  const buttons = [$('authGoogleBtn'), $('authFacebookBtn')];
+  buttons.forEach(function (button) { button.disabled = true; });
+  setAuthFeedback('Conectando com ' + (provider === 'google' ? 'Google' : 'Facebook') + '…', false);
+  try {
+    const result = await authClient.auth.signInWithOAuth({
+      provider: provider,
+      options: { redirectTo: AXO_PUBLIC_URL }
+    });
+    if (result.error) throw result.error;
+    // Supabase redirects the browser to the selected provider when OAuth is configured.
+  } catch (err) {
+    setAuthFeedback(friendlyAuthError(err, 'signin'), true);
+    buttons.forEach(function (button) { button.disabled = false; });
+  }
+}
+$('authGoogleBtn').addEventListener('click', function () { startSocialSignIn('google'); });
+$('authFacebookBtn').addEventListener('click', function () { startSocialSignIn('facebook'); });
 authOpenButton.addEventListener('click', function () { openAuthDialog('signin'); });
 $('authCloseBtn').addEventListener('click', closeAuthDialog);
 $('authContinueBtn').addEventListener('click', closeAuthDialog);
