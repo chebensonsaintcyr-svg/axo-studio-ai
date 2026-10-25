@@ -969,10 +969,10 @@ async function syncCloudCampaignHistory() {
   if (!authClient || !currentAuthSession || !currentAuthSession.user) return;
   const userId = currentAuthSession.user.id;
   try {
-    // Preserve campaigns previously saved only in this browser by uploading them
-    // before refreshing the cloud-backed list. UUID IDs are already cloud records.
-    const localEntries = getCampaignHistory();
-    const pendingEntries = localEntries.filter(function (item) {
+    // Upload browser-only campaigns first, and record each cloud ID immediately
+    // so a retry does not upload the same entry again after a partial failure.
+    const initialEntries = getCampaignHistory();
+    const pendingEntries = initialEntries.filter(function (item) {
       return !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(item.id));
     });
     for (const entry of pendingEntries) {
@@ -984,6 +984,13 @@ async function syncCloudCampaignHistory() {
         campaign: entry.campaign
       }).select('id,created_at').single();
       if (inserted.error) throw inserted.error;
+      const latestLocal = getCampaignHistory();
+      const pendingIndex = latestLocal.findIndex(function (item) { return String(item.id) === String(entry.id); });
+      if (pendingIndex >= 0) {
+        latestLocal[pendingIndex].id = inserted.data.id;
+        latestLocal[pendingIndex].savedAt = inserted.data.created_at || entry.savedAt;
+        localStorage.setItem(scopedStorageKey(HISTORY_STORAGE_KEY), JSON.stringify(latestLocal));
+      }
     }
 
     const result = await authClient.from('axo_campaigns')
@@ -993,11 +1000,22 @@ async function syncCloudCampaignHistory() {
       .limit(HISTORY_LIMIT);
     if (result.error) throw result.error;
     if (!currentAuthSession || !currentAuthSession.user || currentAuthSession.user.id !== userId) return;
-    const entries = (result.data || []).map(function (row) {
+    const cloudEntries = (result.data || []).map(function (row) {
       const brief = row.brief && typeof row.brief === 'object' ? row.brief : {};
       if (!brief.business) brief.business = row.business_name || 'Campanha sem nome';
       return { id: row.id, savedAt: row.created_at, brief: brief, campaign: row.campaign || {} };
     });
+
+    // A campaign may be generated while the cloud request is in flight.
+    // Merge those fresh local entries instead of replacing them with an empty/stale cloud list.
+    const latestLocal = getCampaignHistory();
+    const cloudIds = new Set(cloudEntries.map(function (item) { return String(item.id); }));
+    const freshLocalEntries = latestLocal.filter(function (item) {
+      return !cloudIds.has(String(item.id));
+    });
+    const entries = freshLocalEntries.concat(cloudEntries)
+      .sort(function (a, b) { return new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime(); })
+      .slice(0, HISTORY_LIMIT);
     localStorage.setItem(scopedStorageKey(HISTORY_STORAGE_KEY), JSON.stringify(entries));
     renderHistory();
   } catch (err) {
