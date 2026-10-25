@@ -769,6 +769,7 @@ function syncAuthInterface(session) {
   if (scopeChanged) {
     applyTheme(readSavedThemeForScope(), false);
     renderHistory();
+    if (hasSession) syncCloudCampaignHistory();
   }
 }
 function openAuthDialog(mode) {
@@ -958,8 +959,65 @@ function saveCampaignHistory(brief, campaign) {
     const history = [entry].concat(getCampaignHistory()).slice(0, HISTORY_LIMIT);
     localStorage.setItem(scopedStorageKey(HISTORY_STORAGE_KEY), JSON.stringify(history));
     renderHistory();
+    persistCampaignToCloud(entry);
   } catch (err) {
     console.warn('Não foi possível salvar o histórico localmente.', err);
+  }
+}
+
+async function syncCloudCampaignHistory() {
+  if (!authClient || !currentAuthSession || !currentAuthSession.user) return;
+  const userId = currentAuthSession.user.id;
+  try {
+    const result = await authClient.from('axo_campaigns')
+      .select('id,user_id,business_name,brief,campaign,created_at')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(HISTORY_LIMIT);
+    if (result.error) throw result.error;
+    if (!currentAuthSession || !currentAuthSession.user || currentAuthSession.user.id !== userId) return;
+    const entries = (result.data || []).map(function (row) {
+      const brief = row.brief && typeof row.brief === 'object' ? row.brief : {};
+      if (!brief.business) brief.business = row.business_name || 'Campanha sem nome';
+      return { id: row.id, savedAt: row.created_at, brief: brief, campaign: row.campaign || {} };
+    });
+    localStorage.setItem(scopedStorageKey(HISTORY_STORAGE_KEY), JSON.stringify(entries));
+    renderHistory();
+  } catch (err) {
+    console.warn('Não foi possível sincronizar o histórico com a nuvem.', err);
+    if (typeof showAccountToast === 'function') {
+      showAccountToast('Não foi possível sincronizar o histórico. Confira se a tabela axo_campaigns foi criada.');
+    }
+  }
+}
+
+async function persistCampaignToCloud(entry) {
+  if (!authClient || !currentAuthSession || !currentAuthSession.user) return;
+  const userId = currentAuthSession.user.id;
+  try {
+    const result = await authClient.from('axo_campaigns').insert({
+      user_id: userId,
+      business_name: String(entry.brief.business || 'Campanha sem nome'),
+      brief: entry.brief,
+      campaign: entry.campaign
+    }).select('id,created_at').single();
+    if (result.error) throw result.error;
+    if (!currentAuthSession || !currentAuthSession.user || currentAuthSession.user.id !== userId) return;
+    const entries = getCampaignHistory();
+    const index = entries.findIndex(function (item) { return String(item.id) === String(entry.id); });
+    if (index >= 0) {
+      entries[index].id = result.data.id;
+      entries[index].savedAt = result.data.created_at || entry.savedAt;
+      localStorage.setItem(scopedStorageKey(HISTORY_STORAGE_KEY), JSON.stringify(entries));
+      renderHistory();
+    } else {
+      await syncCloudCampaignHistory();
+    }
+  } catch (err) {
+    console.warn('Não foi possível salvar a campanha na nuvem.', err);
+    if (typeof showAccountToast === 'function') {
+      showAccountToast('Campanha salva neste dispositivo, mas não foi sincronizada com a nuvem.');
+    }
   }
 }
 
@@ -1961,6 +2019,12 @@ $('historyList').addEventListener('click', function (event) {
         return String(item.id) !== String(id);
       })));
       renderHistory();
+      if (authClient && currentAuthSession && currentAuthSession.user && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(id))) {
+        authClient.from('axo_campaigns').delete().eq('id', id).eq('user_id', currentAuthSession.user.id)
+          .then(function (result) {
+            if (result.error) console.warn('Não foi possível excluir a campanha da nuvem.', result.error);
+          });
+      }
     } catch (err) {
       console.warn('Não foi possível atualizar o histórico localmente.', err);
     }
