@@ -750,7 +750,7 @@ function syncAuthInterface(session) {
   $('authIntro').textContent = !configured
     ? 'O acesso por conta será ativado depois de conectar o provedor de autenticação.'
     : hasSession ? 'Bem-vindo de volta. Seu espaço de criação está pronto.' : 'Entre ou crie sua conta para usar a geração de campanhas e narração por IA.';
-  authOpenButton.textContent = hasSession ? 'Minha conta' : 'Entrar';
+  authOpenButton.setAttribute('aria-label', hasSession ? 'Minha conta' : 'Entrar');
   if (hasSession) $('authUserEmail').textContent = currentAuthSession.user.email || 'Conta AXO';
   if (scopeChanged) {
     applyTheme(readSavedThemeForScope(), false);
