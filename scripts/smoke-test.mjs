@@ -31,6 +31,9 @@ report("HTML inline JavaScript syntax");
 // 2. Verify core UI features stay present and key IDs are not duplicated.
 for (const fragment of [
   'id="campaignForm"',
+  'id="axoWebGLBackground"',
+  'id="axoExperiencePanel"',
+  'id="axoOrbHue"',
   'id="authOpenBtn"',
   'id="authDialog"',
   'id="authForm"',
@@ -85,15 +88,11 @@ for (const fragment of [
   "class=\"result-video-step\"",
   'class="history-details"',
   "Ver campanhas salvas",
-  "const THEME_STORAGE_KEY = 'axoStudioThemeV2'",
   "const HISTORY_STORAGE_KEY = 'axoStudioCampaignHistoryV1'",
   "function scopedStorageKey",
-  "function readSavedThemeForScope",
   "function closeAuthDialog",
   "showAccountToast('Acesso confirmado. Bem-vindo ao AXO.')",
   "activeAccountScope = nextScope",
-  'option value="gold">Preto e dourado',
-  "html[data-theme=\"gold\"] .btn:not(.secondary)",
   "function showExampleCampaign",
   "Exemplo demonstrativo · sem chamada à IA",
   'https://axo-studio-ai-api.chebensonsaintcyr.workers.dev/',
@@ -142,16 +141,8 @@ for (const fragment of [
   "function renderHistory",
   "localStorage.setItem(scopedStorageKey(HISTORY_STORAGE_KEY)",
   "localStorage.getItem(scopedStorageKey(HISTORY_STORAGE_KEY))",
-  'id="themeSelect"',
-  "function applyTheme",
-  "localStorage.setItem(scopedStorageKey(THEME_STORAGE_KEY)",
-  'value="silver"',
-  'value="purple"',
-  'value="light"',
-  "document.documentElement.dataset.theme",
   'id="whatsappBtn"',
   "const whatsappUrl = 'https://wa.me/?text=' + encodeURIComponent(campaignText)",
-  'html[data-theme="light"] .output p{color:#333}',
   'rel="canonical"',
   'property="og:title"',
   '"@type": "WebSite"',
@@ -191,7 +182,7 @@ assert.ok(html.includes("generateVideo(d, c, $('videoBtn'), files, commonsImages
 report("Video renderer uses cached scenes, a 24 fps cap, and AXO gold styling");
 report("Single-speaker narration preview and reuse of the exact approved voice clip");
 report("Creative production kit controls, prompts, and TXT export");
-report("Organized result steps, optional image accordion, collapsible history, and default gold theme");
+report("Organized result steps, optional image accordion, and collapsible history");
 
 assert.ok(robotsSource.includes("User-agent: *"), "robots.txt should include the general crawler rule.");
 assert.ok(robotsSource.includes("Sitemap: https://chebensonsaintcyr-svg.github.io/axo-studio-ai/sitemap.xml"),
