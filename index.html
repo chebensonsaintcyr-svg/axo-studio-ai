@@ -525,6 +525,66 @@ body{
   .feature:hover,.panel:hover{transform:none;transition:none}
 }
 
+
+/* AXO Studio — bold product landing refresh */
+:root{--bg:#08090c;--panel:#11141a;--line:#292e38;--text:#f4f1e9;--muted:#a5a8b2}
+body{background:#08090c;background-image:radial-gradient(ellipse at 82% 8%,#9275d52c,transparent 30%),radial-gradient(ellipse at 12% 24%,#d6b7791c,transparent 34%),linear-gradient(180deg,#08090c,#0b0d12 55%,#08090c)}
+main{overflow:hidden}
+.axo-header{position:sticky;top:0;z-index:50;background:#090a0de8;backdrop-filter:blur(20px);border-bottom:1px solid #d6b77922}
+.axo-header .nav{border:0}
+.axo-header .navitem{transition:color .2s ease,background .2s ease}
+.axo-header .navitem:hover,.axo-header .navitem.is-current{color:#f1d99f}
+.hero{position:relative;min-height:660px;padding-top:110px;padding-bottom:100px;gap:54px;align-items:center}
+.hero:after{content:"";position:absolute;z-index:-2;inset:20px -14vw 10px 38%;pointer-events:none;background:radial-gradient(ellipse at 55% 48%,#d6b77920,transparent 36%),radial-gradient(ellipse at 60% 45%,#8e78c82b,transparent 62%);filter:blur(28px)}
+.hero>div:first-child{position:relative;z-index:2}
+.hero .eyebrow{padding:9px 14px;letter-spacing:.14em;font-size:10px;border-color:#d6b77966;background:#d6b77912;color:#f0dba9}
+.hero h1{font-size:clamp(52px,6.5vw,86px);line-height:.99;letter-spacing:-.065em;max-width:760px;margin:28px 0}
+.hero .lead{font-size:18px;line-height:1.8;max-width:540px;color:#b7bac3}
+.hero .actions{margin-top:34px;gap:14px}
+.hero .actions .btn{min-height:54px;padding:0 22px;border-radius:14px}
+.hero .proof{gap:20px;color:#c4c4ca;font-size:12px;margin-top:26px}
+.hero .preview{position:relative;padding:13px;border-radius:28px;border:1px solid #d6b77950;background:linear-gradient(145deg,#1c2029ed,#0e1016f2);box-shadow:0 45px 120px #000c,0 0 70px #8e78c81c;transform:perspective(1200px) rotateY(-7deg) rotateX(2deg);transition:transform .5s ease,box-shadow .5s ease}
+.hero .preview:hover{transform:perspective(1200px) rotateY(-2deg) rotateX(0);box-shadow:0 50px 130px #000d,0 0 90px #d6b77922}
+.hero .preview:before{content:"";position:absolute;z-index:-1;width:72%;aspect-ratio:1;right:-16%;top:-18%;border-radius:50%;background:conic-gradient(from 30deg,#d6b779,#8e78c8,#d6b779);filter:blur(55px);opacity:.28}
+.previewtop{padding:7px 8px 15px;font-size:10px;letter-spacing:.16em}
+.mockvideo{min-height:390px;border-radius:20px;padding:28px;background:radial-gradient(circle at 72% 27%,#a78be65c,transparent 32%),radial-gradient(circle at 23% 85%,#d6b77935,transparent 38%),linear-gradient(145deg,#292a35,#101219 70%,#17141e);border:1px solid #ffffff16}
+.mockvideo:before{width:230px;height:230px;right:-35px;top:35px;border:1px solid #e4c98975;box-shadow:0 0 0 18px #d6b7790c,0 0 0 42px #8e78c817,0 0 80px #d6b77922}
+.video-tag{font-size:10px;letter-spacing:.22em;color:#e8d4a4}
+.video-title{font-size:clamp(36px,4vw,54px);letter-spacing:-.055em;line-height:.98}
+.video-bottom{color:#c7c6ce}
+.play{width:52px;height:52px;background:linear-gradient(135deg,#f1dfb5,#b58c4d);color:#17130d;border:0;box-shadow:0 0 35px #d6b77945}
+.minirow{gap:9px;margin-top:10px}
+.mini{background:#0b0d13c9;border-color:#ffffff17;padding:14px;border-radius:14px;backdrop-filter:blur(12px)}
+.mini b{color:#f1dfb5;font-size:17px}.mini small{color:#aeb0ba}
+.stats-strip{position:relative;border-top:1px solid #ffffff12;border-bottom:1px solid #ffffff12;background:#ffffff04}
+.stats-inner{max-width:1120px;margin:auto;padding:22px 24px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.stat-item{display:flex;gap:12px;align-items:center}.stat-icon{width:38px;height:38px;display:grid;place-items:center;border:1px solid #d6b77945;border-radius:12px;color:#e5c989;background:#d6b77910}
+.stat-item strong{display:block;color:#f0eee8;font-size:13px}.stat-item span:last-child{display:block;color:#9296a1;font-size:11px}
+.section{padding:100px 0}
+.sectionhead{margin-bottom:48px}
+.sectionhead .kicker{letter-spacing:.2em;font-size:10px}
+.section h2{font-size:clamp(34px,4.5vw,54px);letter-spacing:-.055em}
+.section .sub{font-size:15px;line-height:1.8;max-width:600px;margin:auto}
+.features{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.feature{position:relative;min-height:205px;padding:26px;border-radius:20px;border-color:#ffffff15;background:linear-gradient(145deg,#171a22,#0e1015);transition:transform .28s ease,border-color .28s ease,box-shadow .28s ease}
+.feature:after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(135deg,#d6b7790b,transparent 45%,#8e78c80b);opacity:0;transition:opacity .28s ease}
+.feature:hover{transform:translateY(-7px);border-color:#d6b77966;box-shadow:0 24px 55px #0008}
+.feature:hover:after{opacity:1}
+.feature .ico{width:48px;height:48px;border-radius:15px;font-size:21px}
+.feature h3{font-size:18px;letter-spacing:-.02em}
+.feature p{line-height:1.75;color:#a8abb5}
+.generatorgrid{gap:22px}
+.generatorgrid>.panel{border-radius:22px;border-color:#d6b77930;background:linear-gradient(145deg,#171a21,#0d0f14);padding:26px}
+.generatorgrid .formtitle{font-size:24px;letter-spacing:-.04em}
+.generatorgrid .field input,.generatorgrid .field select,.generatorgrid .field textarea{border-color:#343946;background:#0a0c11;border-radius:12px;padding:14px}
+.generatorgrid .field input:focus,.generatorgrid .field select:focus,.generatorgrid .field textarea:focus{border-color:#d6b779;box-shadow:0 0 0 3px #d6b7791c}
+.generatorgrid .output{border-radius:22px}
+.cta{border-radius:28px;border-color:#d6b77944;padding:64px 28px;background:radial-gradient(ellipse at 80% 0%,#8e78c82b,transparent 45%),radial-gradient(ellipse at 10% 100%,#d6b7791c,transparent 42%),#11131a}
+footer{border-top-color:#ffffff18}
+@media(max-width:900px){.hero{min-height:auto;padding-top:76px;padding-bottom:70px;gap:36px}.hero .preview{transform:none}.mockvideo{min-height:330px}.stats-inner{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.hero{padding-top:58px;padding-bottom:55px;gap:30px}.hero h1{font-size:clamp(43px,12vw,62px);line-height:1.01;letter-spacing:-.06em}.hero .lead{font-size:15px;line-height:1.7}.hero .actions{display:grid;grid-template-columns:1fr}.hero .actions .btn{width:100%}.hero .preview{padding:10px;border-radius:21px}.mockvideo{min-height:285px;padding:20px}.video-title{font-size:40px}.mini{padding:10px}.mini b{font-size:14px}.mini small{font-size:9px}.stats-inner{padding:18px 15px;gap:13px}.stat-item{gap:8px}.stat-icon{width:32px;height:32px;flex:0 0 32px}.stat-item strong{font-size:11px}.stat-item span:last-child{font-size:9px}.section{padding:68px 0}.sectionhead{margin-bottom:32px}.features{grid-template-columns:1fr;gap:12px}.feature{min-height:0;padding:21px}.generatorgrid>.panel{padding:18px}.cta{padding:42px 20px}}
+@media(prefers-reduced-motion:reduce){.hero .preview,.feature,.feature:after{transition:none}}
+
 </style>
 </head>
 <body>
@@ -601,8 +661,8 @@ body{
 <section class="wrap hero" id="inicio">
  <div>
   <span class="eyebrow"><span class="dot"></span> CRIATIVIDADE + INTELIGÊNCIA ARTIFICIAL</span>
-  <h1>Transforme ideias em <span class="gradient">campanhas</span> que chamam atenção.</h1>
-  <p class="lead">Crie conceitos, roteiros e textos de anúncios em minutos. A AXO Studio AI ajuda seu negócio a sair da ideia e chegar à próxima campanha.</p>
+  <h1>Seu próximo anúncio. <span class="gradient">Criado com inteligência.</span></h1>
+  <p class="lead">Um estúdio criativo com IA para transformar seu briefing em estratégia, roteiro, conteúdo e vídeo — tudo em um fluxo de criação.</p>
   <div class="actions"><a class="btn" href="#gerador">Criar minha campanha <span>→</span></a><a class="btn secondary" href="#gerador" id="heroExampleBtn">Ver exemplo pronto</a></div>
   <div class="proof"><span>Em português</span><span>Fluxo simples</span><span>Comece grátis</span></div>
  </div>
