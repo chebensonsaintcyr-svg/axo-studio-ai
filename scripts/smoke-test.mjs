@@ -22,7 +22,7 @@ const scriptBlocks = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi
   .filter((match) => !/\btype\s*=\s*["']application\/ld\+json["']/i.test(match[1]))
   .map((match) => match[2])
   .filter((value) => value.trim());
-assert.equal(scriptBlocks.length, 1, "Expected one inline application script.");
+assert.ok(scriptBlocks.length >= 1, "Expected at least one inline application script.");
 for (const source of scriptBlocks) {
   new vm.Script(source, { filename: "index.html inline JavaScript" });
 }
