@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="gold">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -781,10 +781,8 @@ footer{border-top-color:#ffffff18}
 const $ = id => document.getElementById(id);
 $('year').textContent = new Date().getFullYear();
 
-const THEME_STORAGE_KEY = 'axoStudioThemeV2';
 const HISTORY_STORAGE_KEY = 'axoStudioCampaignHistoryV1';
 const HISTORY_LIMIT = 10;
-const AVAILABLE_THEMES = new Set(['gold', 'silver', 'purple', 'light']);
 // Per-account browser scope: do not show one signed-in user's history/preferences to another.
 let activeAccountScope = 'guest';
 
@@ -792,47 +790,7 @@ function scopedStorageKey(baseKey) {
   return baseKey + ':' + activeAccountScope;
 }
 
-function readSavedThemeForScope() {
-  try {
-    const scopedTheme = localStorage.getItem(scopedStorageKey(THEME_STORAGE_KEY));
-    if (AVAILABLE_THEMES.has(scopedTheme)) return scopedTheme;
-    // Preserve the older global theme as a guest-only preference, never as a new user's preference.
-    if (activeAccountScope === 'guest') {
-      const legacyTheme = localStorage.getItem(THEME_STORAGE_KEY);
-      if (AVAILABLE_THEMES.has(legacyTheme)) {
-        localStorage.setItem(scopedStorageKey(THEME_STORAGE_KEY), legacyTheme);
-        return legacyTheme;
-      }
-    }
-  } catch (err) {
-    // The default theme remains available if browser storage is blocked.
-  }
-  return 'gold';
-}
 
-function applyTheme(theme, saveChoice) {
-  const chosenTheme = AVAILABLE_THEMES.has(theme) ? theme : 'gold';
-  document.documentElement.dataset.theme = chosenTheme;
-  $('themeSelect').value = chosenTheme;
-  const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-  if (metaThemeColor) {
-    metaThemeColor.content = chosenTheme === 'light' ? '#f3f3f1' : chosenTheme === 'purple' ? '#08060d' : '#050505';
-  }
-  if (saveChoice) {
-    try {
-      localStorage.setItem(scopedStorageKey(THEME_STORAGE_KEY), chosenTheme);
-      $('themeStatus').textContent = activeAccountScope === 'guest'
-        ? 'Preferência salva neste navegador'
-        : 'Preferência salva para esta conta neste navegador';
-    } catch (err) {
-      $('themeStatus').textContent = 'Tema aplicado até fechar o navegador';
-    }
-  }
-}
-applyTheme(readSavedThemeForScope(), false);
-$('themeSelect').addEventListener('change', function () {
-  applyTheme($('themeSelect').value, true);
-});
 
 
 // AXO account: Supabase Auth (email/password) with persisted sessions.
@@ -939,7 +897,6 @@ function syncAuthInterface(session) {
   authOpenButton.setAttribute('aria-label', hasSession ? 'Minha conta' : 'Entrar');
   if (hasSession) $('authUserEmail').textContent = currentAuthSession.user.email || 'Conta AXO';
   if (scopeChanged) {
-    applyTheme(readSavedThemeForScope(), false);
     renderHistory();
     if (hasSession) syncCloudCampaignHistory();
   }
