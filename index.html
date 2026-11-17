@@ -427,9 +427,48 @@ footer{border-top-color:#d7b45a20}
 @media(max-width:480px){.axo-header .nav{margin-top:8px;padding:8px}.axo-header .brand{flex-basis:118px;height:48px}.axo-header .brand-image{width:105px;height:45px}.axo-header .navtools{gap:5px}.axo-header .theme-toolbar{padding:0 8px;min-height:38px}.axo-header .theme-sun{font-size:26px}.axo-header .nav-auth{width:40px;height:40px}.axo-header .account-icon{font-size:24px}.axo-header .navcta{font-size:11px;min-height:40px;padding:0 10px;border-radius:11px}.axo-header .navlinks .navitem{font-size:10px;gap:3px;padding:9px 6px}}
 @media(prefers-reduced-motion:reduce){.axo-header .navitem{transition:none!important}}
 
+
+#axoWebGLBackground{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.9}
+body>*:not(#axoWebGLBackground):not(#axoExperiencePanel):not(#axoExperienceToggle){position:relative;z-index:1}
+.hero{position:relative;isolation:isolate}
+.hero:before{content:"";position:absolute;inset:-35px -7vw -30px 25%;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 55% 42%,#c99b3a18,transparent 48%);filter:blur(12px)}
+.eyebrow{border-color:#c6a45b66;color:#f5e8c6;background:#c49a3b12}.dot{background:#e7bd62;box-shadow:0 0 18px #e4b84e}
+.gradient{background:linear-gradient(100deg,#fff8e8,#e8c778 48%,#a97a28);-webkit-background-clip:text;background-clip:text;color:transparent}
+.btn:not(.secondary){background:linear-gradient(120deg,#f3d78e,#b88a36 62%,#806021);color:#17120a;box-shadow:0 10px 34px #c69a3b2b}
+.preview{border-color:#c49a3b44;box-shadow:0 35px 100px #000b,0 0 55px #c49a3b12}
+.mockvideo{background:radial-gradient(circle at 70% 30%,#d9ad4c2b,transparent 38%),linear-gradient(135deg,#292319,#100f0d 62%,#17130c)}
+.kicker,.stepnum{color:#e7c879}.ico{background:#c49a3b12;border-color:#c49a3b44}
+#axoExperienceToggle{position:fixed;right:18px;bottom:18px;z-index:1001;border:1px solid #d7b45a77;border-radius:999px;padding:11px 15px;background:#10100eef;color:#f4dfaa;font:700 11px/1.2 Inter,system-ui,sans-serif;letter-spacing:.11em;text-transform:uppercase;box-shadow:0 8px 35px #0009;cursor:pointer;backdrop-filter:blur(14px)}
+#axoExperienceToggle:before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#e4bd64;box-shadow:0 0 12px #e4bd64;margin-right:9px}
+#axoExperiencePanel{position:fixed;right:18px;bottom:72px;z-index:1002;width:min(360px,calc(100vw - 28px));max-height:min(78vh,690px);overflow:auto;padding:19px;border:1px solid #b9944c66;border-radius:20px;background:linear-gradient(145deg,#17150fee,#090909f5);color:#f7f2e7;box-shadow:0 25px 90px #000c;backdrop-filter:blur(22px);font:13px/1.45 Inter,system-ui,sans-serif}
+#axoExperiencePanel[hidden]{display:none}.axo-panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:6px}
+.axo-panel-head strong{font-size:14px;letter-spacing:.12em}.axo-panel-head button{border:1px solid #ffffff22;border-radius:9px;background:#ffffff0b;color:#fff;padding:6px 10px;cursor:pointer}
+.axo-panel-intro{color:#b7ad98;font-size:12px;margin:0 0 16px}.axo-control{padding:12px 0;border-top:1px solid #ffffff12}
+.axo-control label{display:flex;justify-content:space-between;gap:10px;color:#eee4ce;font-size:12px;font-weight:650;margin-bottom:8px}
+.axo-control output{color:#d8b66c;font-variant-numeric:tabular-nums}.axo-control input[type=range]{width:100%;accent-color:#cba34e}
+.axo-control select{width:100%;padding:9px;border:1px solid #65512b;border-radius:9px;background:#0b0a08;color:#f5edda}
+.axo-panel-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.axo-panel-actions button{border:1px solid #b9944c66;border-radius:10px;background:#c49a3b18;color:#f1d99d;padding:9px 12px;font-weight:700;cursor:pointer}
+.axo-panel-actions button.primary{background:linear-gradient(120deg,#f3d78e,#b88a36);color:#17120a;border:0}
+@media(max-width:700px){#axoWebGLBackground{opacity:.62}.hero:before{inset:-20px -20px -10px}#axoExperienceToggle{right:12px;bottom:12px;padding:10px 12px}#axoExperiencePanel{right:10px;bottom:62px;max-height:72vh}}
+@media(prefers-reduced-motion:reduce){#axoWebGLBackground{opacity:.35}}
+
 </style>
 </head>
 <body>
+
+<canvas id="axoWebGLBackground" aria-hidden="true"></canvas>
+<button id="axoExperienceToggle" type="button" aria-expanded="false" aria-controls="axoExperiencePanel">Personalizar experiência</button>
+<aside id="axoExperiencePanel" hidden aria-label="Personalização visual do AXO">
+<div class="axo-panel-head"><strong>AXO EXPERIENCE LAB</strong><button id="axoPanelClose" type="button" aria-label="Fechar painel">✕</button></div>
+<p class="axo-panel-intro">Ajuste o núcleo 3D e a atmosfera visual. Suas preferências ficam salvas neste dispositivo.</p>
+<div class="axo-control"><label for="axoOrbSize">Tamanho do núcleo <output id="axoOrbSizeValue">100%</output></label><input id="axoOrbSize" type="range" min="65" max="140" value="100"></div>
+<div class="axo-control"><label for="axoOrbGlow">Intensidade da luz <output id="axoOrbGlowValue">75%</output></label><input id="axoOrbGlow" type="range" min="15" max="130" value="75"></div>
+<div class="axo-control"><label for="axoOrbSpeed">Velocidade da animação <output id="axoOrbSpeedValue">50%</output></label><input id="axoOrbSpeed" type="range" min="0" max="150" value="50"></div>
+<div class="axo-control"><label for="axoOrbParticles">Partículas <output id="axoOrbParticlesValue">65%</output></label><input id="axoOrbParticles" type="range" min="0" max="100" value="65"></div>
+<div class="axo-control"><label for="axoOrbHue">Tom do núcleo</label><select id="axoOrbHue"><option value="0">Champagne gold</option><option value="1">Ouro clássico</option><option value="2">Prata lunar</option><option value="3">Azul elétrico</option><option value="4">Violeta cósmico</option></select></div>
+<div class="axo-control"><label for="axoOrbMotion">Interação com o cursor</label><select id="axoOrbMotion"><option value="1">Reagir ao movimento</option><option value="0">Movimento automático</option></select></div>
+<div class="axo-panel-actions"><button class="primary" id="axoPresetCinematic" type="button">Modo cinematográfico</button><button id="axoResetExperience" type="button">Restaurar padrão</button></div>
+</aside>
 <header class="wrap axo-header">
  <nav class="nav" aria-label="Navegação principal">
   <a class="brand" href="#inicio" aria-label="AXO Studio AI início"><img class="brand-image" src="assets/axo-logo.svg" alt="AXO Studio AI"></a>
@@ -2224,6 +2263,33 @@ generateReelVoicesButton.addEventListener('click', async function () {
   }
 });
 
+</script>
+
+<script>
+(function(){
+const canvas=document.getElementById('axoWebGLBackground'),panel=document.getElementById('axoExperiencePanel'),toggle=document.getElementById('axoExperienceToggle');
+if(!canvas||!panel||!toggle)return;
+const ids={size:'axoOrbSize',glow:'axoOrbGlow',speed:'axoOrbSpeed',particles:'axoOrbParticles',hue:'axoOrbHue',motion:'axoOrbMotion'};
+const defaults={size:100,glow:75,speed:50,particles:65,hue:0,motion:1};let cfg={...defaults},pointer=[0,0],gl=null,program=null,raf=0,start=performance.now();
+try{cfg={...defaults,...JSON.parse(localStorage.getItem('axo-experience-settings-v1')||'{}')};}catch(e){}
+Object.keys(ids).forEach(k=>document.getElementById(ids[k]).value=cfg[k]);
+function labels(){['size','glow','speed','particles'].forEach(k=>{document.getElementById('axo'+k[0].toUpperCase()+k.slice(1)+'Value').textContent=cfg[k]+'%';});}
+function save(){try{localStorage.setItem('axo-experience-settings-v1',JSON.stringify(cfg));}catch(e){}}
+Object.keys(ids).forEach(k=>document.getElementById(ids[k]).addEventListener('input',e=>{cfg[k]=Number(e.target.value);labels();save();}));
+labels();
+toggle.addEventListener('click',()=>{panel.hidden=!panel.hidden;toggle.setAttribute('aria-expanded',String(!panel.hidden));});
+document.getElementById('axoPanelClose').addEventListener('click',()=>{panel.hidden=true;toggle.setAttribute('aria-expanded','false');});
+function apply(v){cfg={...v};Object.keys(ids).forEach(k=>document.getElementById(ids[k]).value=cfg[k]);labels();save();}
+document.getElementById('axoResetExperience').addEventListener('click',()=>apply(defaults));
+document.getElementById('axoPresetCinematic').addEventListener('click',()=>apply({size:115,glow:110,speed:32,particles:82,hue:0,motion:1}));
+window.addEventListener('pointermove',e=>{pointer=[(e.clientX/innerWidth-.5)*2,(.5-e.clientY/innerHeight)*2];},{passive:true});
+const vertex='attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
+const fragment="precision highp float;\nuniform vec2 res; uniform float t; uniform vec2 mouse; uniform float size; uniform float glow; uniform float speed; uniform float particles; uniform float hue;\nfloat hash(vec3 p){p=fract(p*.3183099+.1);p*=17.0;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}\nfloat noise(vec3 x){vec3 i=floor(x),f=fract(x);f=f*f*(3.0-2.0*f);return mix(mix(mix(hash(i),hash(i+vec3(1.,0.,0.)),f.x),mix(hash(i+vec3(0.,1.,0.)),hash(i+vec3(1.,1.,0.)),f.x),f.y),mix(mix(hash(i+vec3(0.,0.,1.)),hash(i+vec3(1.,0.,1.)),f.x),mix(hash(i+vec3(0.,1.,1.)),hash(i+vec3(1.,1.,1.)),f.x),f.y),f.z);}\nvec3 palette(float h){if(h<.5)return vec3(1.,.72,.31);if(h<1.5)return vec3(1.,.48,.10);if(h<2.5)return vec3(.72,.83,1.);if(h<3.5)return vec3(.15,.62,1.);return vec3(.72,.38,1.);}\nfloat scene(vec3 p,float tm){float a=tm*.22;mat2 r=mat2(cos(a),-sin(a),sin(a),cos(a));p.xz=r*p.xz;p.xy=mat2(cos(a*.36),-sin(a*.36),sin(a*.36),cos(a*.36))*p.xy;float sph=length(p)-(.72*size);sph+=(noise(p*5.+tm*.16)-.5)*.035;float ring=length(vec2(length(p.xz)-.91*size,p.y))-.012;return min(sph,ring);}\nvec3 normalAt(vec3 p,float tm){vec2 e=vec2(.001,0.);return normalize(vec3(scene(p+e.xyy,tm)-scene(p-e.xyy,tm),scene(p+e.yxy,tm)-scene(p-e.yxy,tm),scene(p+e.yyx,tm)-scene(p-e.yyx,tm)));}\nvoid main(){vec2 uv=(gl_FragCoord.xy-.5*res)/res.y;vec3 ro=vec3(uv*2.25,3.15);ro.xy-=mouse*.13;vec3 rd=normalize(vec3(uv*2.25,-1.75));float tm=t*speed;vec3 col=vec3(.018,.018,.019);float vign=1.-smoothstep(.25,1.55,length(uv));col+=vec3(.035,.027,.014)*vign;vec3 p=ro;float d=0.;bool hit=false;for(int i=0;i<90;i++){p=ro+rd*d;float h=scene(p,tm);if(h<.002){hit=true;break;}d+=h*.78;if(d>7.)break;}vec3 gold=palette(hue);if(hit){vec3 n=normalAt(p,tm);vec3 light=normalize(vec3(-.7,.9,1.4));float diff=max(dot(n,light),0.);float fres=pow(1.-max(dot(n,-rd),0.),3.);float spec=pow(max(dot(reflect(-light,n),-rd),0.),48.);float bands=sin(atan(p.z,p.x)*22.+noise(p*8.)*5.)*.5+.5;col=gold*(.12+diff*.72+bands*.12)+gold*(fres*.95+spec*1.4)*glow*.012;}float halo=exp(-abs(length(uv)-.53*size)*9.);col+=gold*halo*.11*glow*.01;vec2 grid=gl_FragCoord.xy/31.;vec2 cell=floor(grid);float rnd=hash(vec3(cell,2.));vec2 local=fract(grid)-.5;float stars=step(.992-particles*.00008,rnd)*smoothstep(.5,.02,length(local))*(.3+.7*sin(t*.8+rnd*8.));col+=vec3(.78,.65,.39)*stars*.5;col=pow(max(col,0.),vec3(.88));gl_FragColor=vec4(col,1.);}";
+function init(){try{gl=canvas.getContext('webgl',{alpha:true,antialias:false,powerPreference:'low-power'});if(!gl)return;function compile(type,src){const sh=gl.createShader(type);gl.shaderSource(sh,src);gl.compileShader(sh);if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(sh));return sh;}program=gl.createProgram();gl.attachShader(program,compile(gl.VERTEX_SHADER,vertex));gl.attachShader(program,compile(gl.FRAGMENT_SHADER,fragment));gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program));gl.useProgram(program);const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);const a=gl.getAttribLocation(program,'p');gl.enableVertexAttribArray(a);gl.vertexAttribPointer(a,2,gl.FLOAT,false,0,0);}catch(e){canvas.style.display='none';}}
+const uniforms={};function render(now){if(!gl||!program)return;const dpr=Math.min(devicePixelRatio||1,1.35),w=Math.floor(innerWidth*dpr),h=Math.floor(innerHeight*dpr);if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;gl.viewport(0,0,w,h);}gl.useProgram(program);Object.keys({res:1,t:1,mouse:1,size:1,glow:1,speed:1,particles:1,hue:1}).forEach(k=>uniforms[k]=uniforms[k]||gl.getUniformLocation(program,k));gl.uniform2f(uniforms.res,w,h);gl.uniform1f(uniforms.t,(now-start)/1000);gl.uniform2f(uniforms.mouse,cfg.motion?pointer[0]:0,cfg.motion?pointer[1]:0);gl.uniform1f(uniforms.size,cfg.size/100);gl.uniform1f(uniforms.glow,cfg.glow);gl.uniform1f(uniforms.speed,cfg.speed/100);gl.uniform1f(uniforms.particles,cfg.particles);gl.uniform1f(uniforms.hue,cfg.hue);gl.drawArrays(gl.TRIANGLES,0,6);raf=requestAnimationFrame(render);}
+init();if(gl&&!matchMedia('(prefers-reduced-motion: reduce)').matches)raf=requestAnimationFrame(render);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelAnimationFrame(raf);else if(gl&&!matchMedia('(prefers-reduced-motion: reduce)').matches)raf=requestAnimationFrame(render);});
+})();
 </script>
 </body>
 </html>
